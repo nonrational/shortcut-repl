@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'pry'
+require 'active_support'
+require 'active_model'
+require 'shortcut_ruby'
+
+def load_paths!
+  path = File.expand_path("../..", __FILE__)
+  Dir.glob("#{path}/**/*.rb") { |f| puts f; load f }
+end
+
+def reload!
+  Object.send(:remove_const, :Scrb)
+  load_paths!
+end
+
+load_paths!
+
+Pry.start
