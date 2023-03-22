@@ -42,9 +42,10 @@ module Scrb
       ::Scrb.shortcut.iterations.list[:content].map { |h| Iteration.new(h) }.select(&:finished?).max_by(&:end_date)
     end
 
-    attr_accessor :app_url, :associated_groups, :created_at, :end_date, :entity_type, :follower_ids, :global_id,
+    attr_reader :created_at, :start_date, :end_date
+    attr_accessor :app_url, :associated_groups, :entity_type, :follower_ids, :global_id,
       :group_ids, :group_mention_ids, :id, :label_ids, :labels, :member_mention_ids, :mention_ids,
-      :name, :start_date, :stats, :status, :updated_at
+      :name, :stats, :status, :updated_at
 
     def stories
       @stories ||= ::Scrb.shortcut.iterations(id).stories.list[:content].map { |s| Scrb::Story.new(s) }
