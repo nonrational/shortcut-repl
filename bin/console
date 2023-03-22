@@ -4,6 +4,7 @@ require 'pry'
 require 'active_support'
 require 'active_model'
 require 'shortcut_ruby'
+require 'dotenv/load'
 
 def load_paths!
   path = File.expand_path("../..", __FILE__)
