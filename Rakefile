@@ -1,32 +1,23 @@
-#!/usr/bin/env ruby
-
+# Rakefile
 require "bundler/setup"
 Bundler.require
-
-require "pry"
-require "irb"
-
 require "active_support"
 require "active_model"
 require "shortcut_ruby"
 require "dotenv/load"
 
 def load_paths!
-  path = File.expand_path("../..", __FILE__)
+  path = File.expand_path("..", __FILE__)
   files = Dir.glob("#{path}/**/*.rb").sort
   files.each do |f|
     # puts f
     load f
   end
-  files.length
 end
 
-def reload!
-  Object.send(:remove_const, :Scrb)
-  load_paths!
+namespace :project_sync do
+  task :run do
+    load_paths!
+    Scrb::BulkProjectSync.new.run
+  end
 end
-
-load_paths!
-
-# Pry.start
-IRB.start
