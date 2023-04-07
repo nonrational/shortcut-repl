@@ -1,4 +1,5 @@
 require "cgi"
+require "yaml"
 
 module Scrb
   class ProjectSync
@@ -7,24 +8,42 @@ module Scrb
     attr_accessor :project_name, :product_area_name, :stories, :has_more_stories, :next_token
 
     def run
+      return false unless
       loop do
         self.stories = fetch_next_page
 
         if stories.any?
-          story_ids = stories.map { |e| e["id"] }
-          puts "#{story_ids.length} updates, field: #{product_area_field.name}, value: #{product_area_field_value.value}"
-          data = {story_ids: story_ids, custom_fields_add: [{field_id: product_area_field.id, value_id: product_area_field_value.id}]}
-          result = ScrbClient.put("/stories/bulk", body: data.to_json)
-          binding.pry unless result.code == 200
-          puts result.first["app_url"]
+
+          puts "#{stories.length} updates, field_name: '#{product_area_field.name}', field_value: '#{product_area_field_value.value}'"
+
+          unless dry_run?
+            results = put_stories_bulk_update
+            puts results.first["app_url"]
+          end
         end
 
         break unless has_more_stories
       end
     end
 
+    def put_stories_bulk_update
+      ScrbClient.put("/stories/bulk", body: {
+        story_ids: stories.map { |e| e["id"] },
+        custom_fields_add: [
+          {
+            field_id: product_area_field.id,
+            value_id: product_area_field_value.id
+          }
+        ]
+      }.to_json).tap { |res| binding.pry unless res.code == 200 }
+    end
+
+    def dry_run?
+      ENV["DRY_RUN"].present?
+    end
+
     def fetch_next_page
-      search_attrs = { detail: :slim, query: query, page_size: 25 }
+      search_attrs = {detail: :slim, query: query, page_size: 25}
       search_attrs[:next] = next_token if next_token
 
       first_page = search_stories(search_attrs)
@@ -36,11 +55,12 @@ module Scrb
     end
 
     def query
-      @query ||= "project:#{project_name} !product-area:#{product_area_name} !is:archived"
+      @query ||= "project:'#{project_name}' !product-area:'#{product_area_name}'"
     end
 
     def product_area_field_value
-      @product_area_field_value ||= product_area_field.find_value(product_area_name)
+      # querying works better with dasherized values, but we need the spaced version to find the correct field value
+      @product_area_field_value ||= product_area_field.find_value(product_area_name.tr("-", " "))
     end
 
     def product_area_field
@@ -61,16 +81,7 @@ module Scrb
     end
 
     def project_product_areas
-      @project_product_areas ||= {
-        process: :process,
-        backend: :backend,
-        design: :design,
-        frontend: :frontend,
-        infrastructure: :infrastructure,
-        "pid token contract": :"PID Token",
-        scoping: :scoping,
-        website: :website
-      }
+      @project_product_areas ||= YAML.load_file("config.yml")["project-product-areas"]
     end
   end
 end
