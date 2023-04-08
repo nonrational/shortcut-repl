@@ -2,7 +2,7 @@ module Scrb
   class IterationReadySort
     def run
       sorted_stories.reverse.each_with_index do |story, i|
-        # Scrb.shortcut.stories(story.id).update(move_to: :first)
+        # move story to the top of the iteration
         ScrbClient.put("/stories/#{story.id}", body: {move_to: :first}.to_json)
       end
     end
@@ -12,15 +12,17 @@ module Scrb
     end
 
     # for debugging purposes only
-    def self.run
+    def self.preview
       sort = Scrb::IterationReadySort.new
-      sort.sorted_stories.map { |s| [s.name, sort.epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.story_type] }
+      sort.sorted_stories.map do |s|
+        [s.name, s.priority_position + sort.story_type_position(s), sort.epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.story_type]
+      end
     end
 
     def sort_order_for(story)
       [
-        epic_product_area_position(story),
         story.priority_position + story_type_position(story),
+        epic_product_area_position(story),
         story.id
       ]
     end
