@@ -1,6 +1,6 @@
 module Scrb
   class IterationReadySort
-    def save
+    def run
       sorted_stories.reverse.each_with_index do |story, i|
         # Scrb.shortcut.stories(story.id).update(move_to: :first)
         ScrbClient.put("/stories/#{story.id}", body: {move_to: :first}.to_json)

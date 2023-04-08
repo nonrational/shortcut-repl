@@ -16,6 +16,7 @@ def load_paths!
 end
 
 namespace :project_sync do
+  desc "Ensure that all stories with a project have the correct product area set"
   task :run do
     load_paths!
     Scrb::BulkProjectSync.new.run
@@ -23,8 +24,9 @@ namespace :project_sync do
 end
 
 namespace :iteration_ready_sort do
+  desc "Sort all the stories in the ready column in the current iteration by epic and priority"
   task :run do
     load_paths!
-    Scrb::IterationReadySort.new.save
+    Scrb::IterationReadySort.new.run
   end
 end
