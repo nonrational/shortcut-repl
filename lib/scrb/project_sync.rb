@@ -59,7 +59,7 @@ module Scrb
 
     def product_area_field_value
       # querying works better with dasherized values, but we need the spaced version to find the correct field value
-      @product_area_field_value ||= product_area_field.find_value(product_area_name.tr("-", " "))
+      @product_area_field_value ||= product_area_field.find_value_by_name(product_area_name.tr("-", " "))
     end
 
     def product_area_field

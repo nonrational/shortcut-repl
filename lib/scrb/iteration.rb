@@ -14,12 +14,6 @@ module Scrb
       ::Scrb.shortcut.iterations.list[:content].map { |h| Iteration.new(h) }
     end
 
-    def move_unfinished_to(iteration)
-      stories.each do |s|
-        # s.update(...)
-      end
-    end
-
     attr_reader :created_at, :start_date, :end_date
     attr_accessor :app_url, :associated_groups, :entity_type, :follower_ids, :global_id,
       :group_ids, :group_mention_ids, :id, :label_ids, :labels, :member_mention_ids, :mention_ids,

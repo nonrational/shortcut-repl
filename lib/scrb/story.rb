@@ -15,9 +15,19 @@ module Scrb
       :stats, :story_links, :story_template_id, :story_type, :task_ids, :updated_at,
       :workflow_id, :workflow_state_id
 
-    def started?
-      started
+    def ready?
+      workflow_state_id == Scrb.ready_state["id"]
     end
+
+    def priority_position
+      @priority_position ||= Scrb.priority_custom_field.find_value_by_id(priority_value_id)&.position || 99
+    end
+
+    def priority_value_id
+      @priority_value_id ||= custom_fields.find { |cf| cf["field_id"] == Scrb.priority_custom_field.id }.try(:[], "value_id")
+    end
+
+    alias_method :started?, :started
 
     def complete?
       workflow_state_id == 1
