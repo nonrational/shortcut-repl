@@ -3,7 +3,7 @@ module Scrb
     def sorted_stories
       ready_stories.sort_by do |story|
         [
-          in_progress_epics_by_id[story.epic_id]&.first&.position || 99,
+          in_progress_epics_by_id[story.epic_id]&.first&.position || 0,
           story.priority_position
         ]
       end
