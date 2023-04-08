@@ -11,7 +11,6 @@ module Scrb
         # move story to the top of the iteration
         ScrbClient.put("/stories/#{story.id}", body: {move_to: :first}.to_json)
       end
-      @ready_stories = nil
     end
 
     def sorted_stories
