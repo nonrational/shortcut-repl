@@ -2,9 +2,6 @@ module Scrb
   class Story
     include ActiveModel::Model
 
-    def self.all
-    end
-
     attr_accessor :app_url, :archived, :blocked, :blocker, :comment_ids, :completed, :completed_at,
       :completed_at_override, :created_at, :custom_fields, :cycle_time, :deadline, :entity_type,
       :epic_id, :estimate, :external_id, :external_links, :file_ids, :follower_ids,
@@ -18,6 +15,8 @@ module Scrb
     def ready?
       workflow_state_id == Scrb.ready_state["id"]
     end
+
+    [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
 
     def product_area
       @product_area ||= Scrb.product_area_custom_field.find_value_by_id(product_area_value_id)

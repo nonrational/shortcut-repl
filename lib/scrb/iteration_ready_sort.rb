@@ -14,21 +14,29 @@ module Scrb
     # for debugging purposes only
     def self.run
       sort = Scrb::IterationReadySort.new
-      sort.sorted_stories.map { |s| [s.name, sort.epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.id] }
+      sort.sorted_stories.map { |s| [s.name, sort.epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.story_type] }
     end
 
     def sort_order_for(story)
       [
         epic_product_area_position(story),
-        story.priority_position,
+        story.priority_position + story_type_position(story),
         story.id
       ]
+    end
+
+    def story_type_position(story)
+      {
+        feature: 0,
+        bug: -1,
+        chore: 1
+      }[story.story_type.to_sym] || 0
     end
 
     def epic_product_area_position(story)
       # TODO: consider deadlines in sorting
       # TODO: consider a story's position within its epic
-      in_progress_epics.find_index { |e| e.id == story.epic_id } || (story.product_area_position * 5)
+      in_progress_epics.find_index { |e| e.id == story.epic_id } || (story.product_area_position * 3)
     end
 
     def priority_values_by_id
