@@ -1,3 +1,7 @@
 project-product-areas:
   project-one: product-area-one
   project-two: product-area-two
+workflow-name: Engineering
+ready-state-name: "Ready for Development"
+default-priority-value: Medium
+
