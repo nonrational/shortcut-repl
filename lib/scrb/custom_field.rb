@@ -1,7 +1,8 @@
 module Scrb
   class CustomField
     include ActiveModel::Model
-    attr_accessor :id, :name, :description, :entity_type, :fixed_position, :updated_at, :field_type, :position, :canonical_name, :enabled, :created_at, :values, :story_types
+    attr_accessor :id, :name, :description, :entity_type, :fixed_position, :updated_at, :field_type,
+      :position, :canonical_name, :enabled, :created_at, :values, :story_types
 
     def self.all
       ScrbClient.get("/custom-fields").map { |r| CustomField.new(r) }
