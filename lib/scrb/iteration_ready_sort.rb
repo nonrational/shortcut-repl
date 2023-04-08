@@ -1,21 +1,31 @@
 module Scrb
   class IterationReadySort
+    attr_reader :iteration
+
+    def initialize(attrs)
+      @iteration = attrs[:iteration] || Iteration.find_current
+    end
+
     def run
       sorted_stories.reverse.each_with_index do |story, i|
         # move story to the top of the iteration
         ScrbClient.put("/stories/#{story.id}", body: {move_to: :first}.to_json)
       end
+      @ready_stories = nil
     end
 
     def sorted_stories
       ready_stories.sort_by { |s| sort_order_for(s) }
     end
 
+    def in_order?
+      sorted_stories.map(&:id) == ready_stories.map(&:id)
+    end
+
     # for debugging purposes only
-    def self.preview
-      sort = Scrb::IterationReadySort.new
-      sort.sorted_stories.map do |s|
-        [s.name, s.priority_position + sort.story_type_position(s), sort.epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.story_type]
+    def preview
+      sorted_stories.map do |s|
+        [s.name, s.priority_position + story_type_position(s), epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.story_type]
       end
     end
 
@@ -58,15 +68,7 @@ module Scrb
     end
 
     def ready_stories
-      @ready_stories ||= current_iteration.stories.filter(&:ready?)
-    end
-
-    def current_iteration
-      @current_iteration ||= Iteration.find_current
-    end
-
-    def ready_state_name
-      @ready_for_name ||= YAML.load_file("config.yml")["ready-state-name"]
+      @ready_stories ||= iteration.stories.filter(&:ready?).sort_by(&:position)
     end
   end
 end

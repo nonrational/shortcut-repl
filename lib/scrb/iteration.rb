@@ -10,6 +10,16 @@ module Scrb
       all.select(&:finished?).max_by(&:end_date)
     end
 
+    def self.find_unstarted_by_name(name)
+      all.select(&:unstarted?).find { |i| i.name.match(/#{name}/i) }
+    end
+
+    def self.where(attrs)
+      all
+        .select { |i| attrs[:name].nil? || i.name.match(/#{attrs[:name]}/i) }
+        .select { |i| attrs[:status].nil? || i.status.match(/#{attrs[:status]}/i) }
+    end
+
     def self.all
       ::Scrb.shortcut.iterations.list[:content].map { |h| Iteration.new(h) }
     end
@@ -23,13 +33,9 @@ module Scrb
       @stories ||= ::Scrb.shortcut.iterations(id).stories.list[:content].map { |s| Story.new(s) }
     end
 
-    def current?
-      status == "started" # end_date > Date.today and start_date <= Date.today
-    end
-
-    def finished?
-      status == "done"
-    end
+    [:started, :done, :unstarted].each { |status| define_method("#{status}?") { self.status.to_sym == status } }
+    alias_method :current?, :started?
+    alias_method :finished?, :done?
 
     def created_at=(datestr)
       @created_at = Date.parse(datestr)

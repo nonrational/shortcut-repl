@@ -27,11 +27,15 @@ module Scrb
     @ready_for_name ||= config["ready-state-name"] || "Ready"
   end
 
+  def self.workflow_name
+    @workflow_name ||= config["workflow-name"] || "Product"
+  end
+
   def self.config
     @config ||= YAML.load_file("config.yml")
   end
 
   def self.ready_state
-    @ready_state ||= ::ScrbClient.get("/workflows").flat_map { |w| w["states"] }.find { |s| s["name"].match(/#{ready_state_name}/i) }
+    @ready_state ||= ::ScrbClient.get("/workflows").find { |w| w["name"] == config["workflow-name"] }["states"].find { |s| s["name"].match(/#{ready_state_name}/i) }
   end
 end
