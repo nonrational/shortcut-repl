@@ -19,8 +19,24 @@ module Scrb
       workflow_state_id == Scrb.ready_state["id"]
     end
 
+    def product_area
+      @product_area ||= Scrb.product_area_custom_field.find_value_by_id(product_area_value_id)
+    end
+
+    def priority
+      @priority ||= Scrb.priority_custom_field.find_value_by_id(priority_value_id) || Scrb.default_priority_custom_field
+    end
+
+    def product_area_position
+      @product_area_position ||= product_area&.position || Scrb.product_area_custom_field.enabled_values.length + 1
+    end
+
     def priority_position
-      @priority_position ||= Scrb.priority_custom_field.find_value_by_id(priority_value_id)&.position || 99
+      @priority_position ||= priority.position
+    end
+
+    def product_area_value_id
+      @product_area_value_id ||= custom_fields.find { |cf| cf["field_id"] == Scrb.product_area_custom_field.id }.try(:[], "value_id")
     end
 
     def priority_value_id

@@ -21,3 +21,10 @@ namespace :project_sync do
     Scrb::BulkProjectSync.new.run
   end
 end
+
+namespace :iteration_ready_sort do
+  task :run do
+    load_paths!
+    Scrb::IterationReadySort.new.save
+  end
+end
