@@ -6,6 +6,8 @@ module Scrb
 
     attr_writer :page_size, :detail
     attr_accessor :query
+
+    # private
     attr_accessor :next_token, :has_more_stories
     attr_writer :page_count
 

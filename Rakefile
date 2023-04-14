@@ -31,6 +31,7 @@ namespace :iteration_ready_sort do
     Scrb::IterationReadySort.new.run
   end
 
+  desc "Preview the stories that would be sorted in the ready column in the current iteration by epic and priority"
   task :preview do
     load_paths!
     puts Scrb::IterationReadySort.new.preview
