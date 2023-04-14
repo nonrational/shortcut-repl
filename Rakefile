@@ -5,6 +5,7 @@ require "active_support"
 require "active_model"
 require "shortcut_ruby"
 require "dotenv/load"
+require "awesome_print"
 
 def load_paths!
   path = File.expand_path("..", __FILE__)
@@ -28,5 +29,10 @@ namespace :iteration_ready_sort do
   task :run do
     load_paths!
     Scrb::IterationReadySort.new.run
+  end
+
+  task :preview do
+    load_paths!
+    puts Scrb::IterationReadySort.new.preview
   end
 end

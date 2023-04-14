@@ -20,6 +20,10 @@ module Scrb
       include ActiveModel::Model
       attr_accessor :id, :value, :position, :color_key, :enabled, :entity_type
       alias_method :name, :value
+
+      def canonical_name
+        value.downcase.dasherize
+      end
     end
 
     def enabled_values

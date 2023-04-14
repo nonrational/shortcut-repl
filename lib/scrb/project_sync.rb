@@ -7,27 +7,19 @@ module Scrb
     attr_accessor :project_name, :product_area_name, :stories, :has_more_stories, :next_token
 
     def run
-      return false unless
-      loop do
-        self.stories = fetch_next_page
+      StorySearch.new(query: query).each_page do |page|
+        puts "#{page[:stories].length} updates, field_name: '#{product_area_field.name}', field_value: '#{product_area_field_value.value}'"
 
-        if stories.any?
-
-          puts "#{stories.length} updates, field_name: '#{product_area_field.name}', field_value: '#{product_area_field_value.value}'"
-
-          unless dry_run?
-            results = put_stories_bulk_update
-            puts results.first["app_url"]
-          end
+        unless dry_run?
+          update = put_stories_bulk_update(page[:stories])
+          puts update.first["app_url"]
         end
-
-        break unless has_more_stories
       end
     end
 
-    def put_stories_bulk_update
+    def put_stories_bulk_update(stories)
       ScrbClient.put("/stories/bulk", body: {
-        story_ids: stories.map { |e| e["id"] },
+        story_ids: stories.map(&:id),
         custom_fields_add: [
           {
             field_id: product_area_field.id,
@@ -41,18 +33,6 @@ module Scrb
       ENV["DRY_RUN"].present?
     end
 
-    def fetch_next_page
-      search_attrs = {detail: :slim, query: query, page_size: 25}
-      search_attrs[:next] = next_token if next_token
-
-      first_page = search_stories(search_attrs)
-
-      self.has_more_stories = first_page[:content]["next"].present?
-      self.next_token = CGI.parse(URI.parse(first_page[:content]["next"]).query)["next"].first if has_more_stories
-
-      first_page[:content]["data"] || []
-    end
-
     def query
       @query ||= "project:'#{project_name}' !product-area:'#{product_area_name}'"
     end
@@ -64,11 +44,6 @@ module Scrb
 
     def product_area_field
       @product_area_field ||= CustomField.find_field("product area")
-    end
-
-    def search_stories(attrs)
-      puts "fetching #{attrs}"
-      ShortcutRuby::Shortcut.new(ENV.fetch("SHORTCUT_API_TOKEN")).search_stories(attrs)
     end
   end
 end

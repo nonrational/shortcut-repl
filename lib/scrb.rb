@@ -1,5 +1,6 @@
 require "csv"
 require "awesome_print"
+require "active_support/all"
 require "hashie"
 
 module Scrb

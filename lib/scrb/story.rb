@@ -12,27 +12,35 @@ module Scrb
       :stats, :story_links, :story_template_id, :story_type, :task_ids, :updated_at,
       :workflow_id, :workflow_state_id
 
+    alias_method :started?, :started
+
     def ready?
       workflow_state_id == Scrb.ready_state["id"]
+    end
+
+    def complete?
+      workflow_state_id == 1
     end
 
     [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
 
     def product_area
-      @product_area ||= Scrb.product_area_custom_field.find_value_by_id(product_area_value_id)
+      @product_area ||= ProductArea.find_by_id(product_area_value_id)
     end
 
     def priority
       @priority ||= Scrb.priority_custom_field.find_value_by_id(priority_value_id) || Scrb.default_priority_custom_field
     end
 
-    def product_area_position
-      @product_area_position ||= product_area&.position || Scrb.product_area_custom_field.enabled_values.length + 1
+    def product_area_priority
+      @product_area_priority ||= product_area&.priority || ProductArea.all.count + 1
     end
 
     def priority_position
       @priority_position ||= priority.position
     end
+
+    private
 
     def product_area_value_id
       @product_area_value_id ||= custom_fields.find { |cf| cf["field_id"] == Scrb.product_area_custom_field.id }.try(:[], "value_id")
@@ -40,16 +48,6 @@ module Scrb
 
     def priority_value_id
       @priority_value_id ||= custom_fields.find { |cf| cf["field_id"] == Scrb.priority_custom_field.id }.try(:[], "value_id")
-    end
-
-    alias_method :started?, :started
-
-    def complete?
-      workflow_state_id == 1
-    end
-
-    def update(attrs)
-      ::Scrb.shortcut.stories(id).update(attrs)
     end
   end
 end
