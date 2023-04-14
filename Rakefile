@@ -16,6 +16,15 @@ def load_paths!
   end
 end
 
+namespace :iteration do
+  desc "Preview the next handful iteration start/end dates"
+  task :preview do
+    load_paths!
+    curr = Scrb::Iteration.find_futuremost
+    6.times { puts curr = curr.build_next }
+  end
+end
+
 namespace :project_sync do
   desc "Ensure that all stories with a project have the correct product area set"
   task :run do

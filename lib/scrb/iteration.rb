@@ -16,16 +16,12 @@ module Scrb
         (end_date + 1.day).to_date
       end
 
-      def length
-        (end_date - start_date).to_i
-      end
-
       def next_end_date
         candidate = next_start_date.next_occurring(:saturday).next_occurring(:saturday).to_date
         days_left = (candidate.end_of_month - candidate).to_i
 
-        if days_left < 12
-          puts "WARNING: #{candidate} is too close to the end of the month. Moving to the following Saturday."
+        if (3..10).cover?(days_left)
+          warn "WARNING: #{candidate} is only #{days_left} days from the end of the month. Moving to the following Saturday."
           candidate = (candidate + 1.day).next_occurring(:saturday).to_date
         end
 
@@ -64,6 +60,10 @@ module Scrb
           .select { |i| attrs[:status].nil? || i.status.match(/#{attrs[:status]}/i) }
       end
 
+      def find_by_name(name)
+        all.find { |i| i.name.match(/#{name}/i) }
+      end
+
       def all
         ::Scrb.shortcut.iterations.list[:content].map { |h| Iteration.new(h) }
       end
@@ -91,13 +91,24 @@ module Scrb
       self.class.where(name: name).any?
     end
 
+    def length
+      (end_date - start_date).to_i
+    end
+
+    delegate :year, to: :end_date
+
+    def to_s
+      # handy for csv rows
+      "#{name},#{start_date},#{end_date}"
+    end
+
     def save
-      return true if exists?
+      existing = self.class.find_by_name(name)
+      return existing if existing.present?
 
-      post_attrs = %i[name start_date end_date].each_with_object({}) { |k, o| o[k] = send(k) }.to_json
+      result = ScrbClient.post("/iterations", body: %i[name start_date end_date].each_with_object({}) { |k, o| o[k] = send(k) }.to_json)
 
-      result = ScrbClient.post("/iterations", body: post_attrs)
-
+      binding.pry unless result.success?
       Iteration.new(result)
     end
 
