@@ -2,12 +2,18 @@ module Scrb
   class Epic
     include ActiveModel::Model
 
-    def self.all
-      ScrbClient.get("/epics").map { |e| Epic.new(e) }
-    end
+    class << self
+      def all
+        ScrbClient.get("/epics").map { |e| Epic.new(e) }
+      end
 
-    def self.find(id)
-      all.find { |e| e.id == id }
+      def in_progress
+        all.select(&:in_progress?)
+      end
+
+      def find(id)
+        all.find { |e| e.id == id }
+      end
     end
 
     attr_accessor :app_url, :archived, :started, :entity_type, :labels, :mention_ids, :member_mention_ids, :associated_groups,
@@ -19,6 +25,20 @@ module Scrb
     alias_method :archived?, :archived
     alias_method :started?, :started
     alias_method :completed?, :completed
+
+    def workflow_state
+      @workflow_states ||= EpicWorkflow.fetch.epic_states.find { |es| es.id == epic_state_id }
+    end
+
+    def planned_start_iteration
+      # find iteration by planned_start_date
+      Iteration.all.sort_by(&:start_date).find { |i| (i.start_date...i.end_date).cover?(planned_start_date) }
+    end
+
+    def target_iteration
+      # find iteration by deadline
+      Iteration.all.sort_by(&:start_date).find { |i| (i.start_date...i.end_date).cover?(deadline) }
+    end
 
     def in_progress?
       !archived? && started? && !completed?
