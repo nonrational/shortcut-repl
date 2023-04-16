@@ -113,7 +113,7 @@ module Scrb
     end
 
     def stories
-      @stories ||= ::Scrb.shortcut.iterations(id).stories.list[:content].map { |s| Story.new(s) }
+      @stories ||= ScrbClient.get("/iterations/#{id}/stories").map { |s| Story.new(s) }
     end
 
     def created_at=(datestr)

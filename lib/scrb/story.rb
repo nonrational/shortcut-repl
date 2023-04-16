@@ -12,14 +12,12 @@ module Scrb
       :stats, :story_links, :story_template_id, :story_type, :task_ids, :updated_at,
       :workflow_id, :workflow_state_id
 
+    alias_method :archived?, :archived
     alias_method :started?, :started
+    alias_method :completed?, :completed
 
     def ready?
       workflow_state_id == Scrb.ready_state["id"]
-    end
-
-    def complete?
-      workflow_state_id == 1
     end
 
     [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
