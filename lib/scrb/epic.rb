@@ -40,6 +40,10 @@ module Scrb
     alias_method :started?, :started
     alias_method :completed?, :completed
 
+    def owner_members
+      @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
+    end
+
     def stories
       @stories ||= begin
         ScrbClient.get("/epics/#{id}/stories").map { |s| Story.new(s) }
