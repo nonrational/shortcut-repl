@@ -6,9 +6,11 @@ module Scrb
 
     class << self
       def fetch
-        workflow = new(ScrbClient.get("/epic-workflow"))
-        workflow.epic_states = workflow.epic_states.map { |es| EpicWorkflowState.new(es) }
-        workflow
+        @workflow ||= begin
+          workflow = new(ScrbClient.get("/epic-workflow"))
+          workflow.epic_states = workflow.epic_states.map { |es| EpicWorkflowState.new(es) }
+          workflow
+        end
       end
     end
 
