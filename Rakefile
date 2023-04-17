@@ -23,6 +23,13 @@ namespace :iteration do
     curr = Scrb::Iteration.find_futuremost
     6.times { puts curr = curr.build_next }
   end
+
+  desc "Create the next iteration"
+  task :create_next do
+    load_paths!
+    curr = Scrb::Iteration.find_futuremost
+    curr.build_next.save
+  end
 end
 
 namespace :project_sync do
