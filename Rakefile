@@ -40,6 +40,13 @@ namespace :project_sync do
   end
 end
 
+desc "Export the config.yml file as a base64 encoded string"
+task :export_config do
+  load_paths!
+  config = Base64.encode64(YAML.load_file("config.yml").to_s).tr("\n", "")
+  puts "export SCRB_CONFIG='#{config}'"
+end
+
 namespace :iteration_ready_sort do
   desc "Sort all the stories in the ready column in the current iteration by epic and priority"
   task :run do

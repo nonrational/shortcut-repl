@@ -42,10 +42,6 @@ module Scrb
       @config ||= ENV["SCRB_CONFIG"].present? ? YAML.load(ENV["SCRB_CONFIG"]) : YAML.load_file("config.yml")
     end
 
-    def export_config
-      puts Base64.encode64(YAML.load_file("config.yml").to_s).tr("\n", "")
-    end
-
     def ready_state
       @ready_state ||= ::ScrbClient.get("/workflows").find { |w| w["name"] == config["workflow-name"] }["states"].find { |s| s["name"].match(/#{ready_state_name}/i) }
     end
