@@ -14,15 +14,25 @@ module Scrb
       def find(id)
         all.find { |e| e.id == id }
       end
+
+      def search(query)
+        EpicSearch.new(query: query).tap(&:fetch_all).epics
+      end
     end
 
-    attr_accessor :app_url, :archived, :started, :entity_type, :labels, :mention_ids, :member_mention_ids, :associated_groups,
-      :project_ids, :stories_without_projects, :completed_at_override, :productboard_plugin_id, :started_at, :completed_at,
-      :name, :global_id, :completed, :productboard_url, :state, :milestone_id, :requested_by_id,
-      :epic_state_id, :label_ids, :started_at_override, :group_id, :updated_at, :group_mention_ids, :productboard_id,
-      :follower_ids, :owner_ids, :external_id, :id, :position, :productboard_name, :stats, :created_at
+    attr_accessor :app_url, :archived, :description, :comments, :started, :entity_type, :labels, :mention_ids,
+      :member_mention_ids, :associated_groups, :project_ids, :stories_without_projects, :completed_at_override,
+      :productboard_plugin_id, :started_at, :completed_at, :name, :global_id, :completed, :productboard_url, :state,
+      :milestone_id, :requested_by_id, :epic_state_id, :label_ids, :started_at_override, :group_id, :updated_at,
+      :group_mention_ids, :productboard_id, :follower_ids, :owner_ids, :external_id, :id, :position, :productboard_name,
+      :stats, :created_at
 
     attr_reader :planned_start_date, :deadline
+
+    def update(attrs)
+      put_response = ScrbClient.put("/epics/#{id}", body: attrs.to_json)
+      put_response.success? ? Epic.new(put_response) : put_response
+    end
 
     def planned_start_date=(datetime)
       @planned_start_date = DateTime.parse(datetime.to_s) unless datetime.nil?

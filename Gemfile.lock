@@ -56,6 +56,7 @@ GEM
       language_server-protocol (~> 3.17.0.2)
       rubocop (~> 1.48.1)
       rubocop-performance (~> 1.16.0)
+    table_print (1.5.7)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
@@ -74,6 +75,7 @@ DEPENDENCIES
   rake
   shortcut_ruby
   standard
+  table_print
 
 BUNDLED WITH
    2.4.9

@@ -8,6 +8,7 @@ gem "awesome_print"
 gem "shortcut_ruby"
 gem "hashie"
 gem "rake"
+gem "table_print"
 
 gem "dotenv", groups: [:development]
 gem "standard", group: [:development, :test]

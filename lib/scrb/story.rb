@@ -15,12 +15,33 @@ module Scrb
     alias_method :archived?, :archived
     alias_method :started?, :started
     alias_method :completed?, :completed
+    [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
+
+    class << self
+      def search(query)
+        StorySearch.new(query: query).tap(&:fetch_all).stories
+      end
+    end
 
     def ready?
       workflow_state_id == Scrb.ready_state["id"]
     end
 
-    [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
+    def in_current_iteration?
+      iteration_id == Scrb.current_iteration.id
+    end
+
+    def workflow
+      @workflow ||= Workflow.find(workflow_id)
+    end
+
+    def workflow_state
+      @workflow_state ||= workflow.workflow_states.find { |s| s.id == workflow_state_id }
+    end
+
+    def owner_members
+      @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
+    end
 
     def product_area
       @product_area ||= ProductArea.find_by_id(product_area_value_id)

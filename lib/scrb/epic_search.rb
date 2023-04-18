@@ -4,9 +4,9 @@ module Scrb
     include Scrb::Searchable
 
     def search_path
-      "/search/stories"
+      "/search/epics"
     end
 
-    alias_method :stories, :items
+    alias_method :epics, :items
   end
 end

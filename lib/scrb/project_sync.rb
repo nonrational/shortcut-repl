@@ -8,10 +8,11 @@ module Scrb
 
     def run
       StorySearch.new(query: query).each_page do |page|
-        puts "#{page[:stories].length} updates, field_name: '#{product_area_field.name}', field_value: '#{product_area_field_value.value}'"
+        binding.pry if page[:items].nil?
+        puts "#{page[:items].length} updates, field_name: '#{product_area_field.name}', field_value: '#{product_area_field_value.value}'"
 
         unless dry_run?
-          update = put_stories_bulk_update(page[:stories])
+          update = put_stories_bulk_update(page[:items])
           puts update.first["app_url"]
         end
       end
