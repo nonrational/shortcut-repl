@@ -2,6 +2,7 @@ require "csv"
 require "awesome_print"
 require "active_support/all"
 require "hashie"
+require "base64"
 
 module Scrb
   class << self
@@ -38,7 +39,11 @@ module Scrb
     end
 
     def config
-      @config ||= YAML.load_file("config.yml")
+      @config ||= ENV["SCRB_CONFIG"].present? ? YAML.load(ENV["SCRB_CONFIG"]) : YAML.load_file("config.yml")
+    end
+
+    def export_config
+      puts Base64.encode64(YAML.load_file("config.yml").to_s).tr("\n", "")
     end
 
     def ready_state

@@ -8,7 +8,6 @@ module Scrb
 
     def run
       StorySearch.new(query: query).each_page do |page|
-        binding.pry if page[:items].nil?
         puts "#{page[:items].length} updates, field_name: '#{product_area_field.name}', field_value: '#{product_area_field_value.value}'"
 
         unless dry_run?
@@ -27,7 +26,9 @@ module Scrb
             value_id: product_area_field_value.id
           }
         ]
-      }.to_json).tap { |res| binding.pry unless res.code == 200 }
+      }.to_json).tap do |res|
+        binding.pry unless res.success?
+      end
     end
 
     def dry_run?

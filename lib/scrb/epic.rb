@@ -36,14 +36,10 @@ module Scrb
 
     def planned_start_date=(datetime)
       @planned_start_date = DateTime.parse(datetime.to_s) unless datetime.nil?
-    rescue Date::Error => e
-      binding.pry
     end
 
     def deadline=(datetime)
       @deadline = DateTime.parse(datetime.to_s) unless datetime.nil?
-    rescue Date::Error => e
-      binding.pry
     end
 
     alias_method :archived?, :archived
