@@ -1,0 +1,22 @@
+name: iteration-ready-sort
+on:
+  # # for testing only
+  # push:
+  #   branches: ['*']
+  schedule:
+    # Run daily at 5am UTC
+    - cron: "0 5 * * *"
+    
+  workflow_dispatch:
+
+jobs:
+  sort:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+
+      - run: bundle
+      - run: rake config:check
