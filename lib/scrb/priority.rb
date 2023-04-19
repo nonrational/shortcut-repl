@@ -15,7 +15,7 @@ module Scrb
     end
 
     def self.default
-      @default ||= find_by_value(::Scrb.config["default-priority-value"])
+      @default ||= find_by_value(::Scrb.fetch_config!("default-priority-value"))
     end
   end
 end

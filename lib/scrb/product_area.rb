@@ -15,7 +15,7 @@ module Scrb
     end
 
     def config_priorities
-      Scrb.config["product-area-priorities"]
+      Scrb.fetch_config!("product-area-priorities")
     end
 
     def default_priority

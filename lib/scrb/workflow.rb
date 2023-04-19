@@ -14,7 +14,7 @@ module Scrb
       end
 
       def default
-        all.find { |w| w.name == Scrb.config["workflow-name"] }
+        all.find { |w| w.name == Scrb.fetch_config!("workflow-name") }
       end
     end
 

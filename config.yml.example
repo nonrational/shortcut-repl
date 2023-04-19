@@ -1,7 +1,8 @@
 project-product-areas:
-  project-one: product-area-one
-  project-two: product-area-two
-workflow-name: Engineering
-ready-state-name: "Ready for Development"
-default-priority-value: Medium
-
+  project-name: product-area-name
+workflow-name: Default
+ready-state-name: "Ready for Work"
+default-priority-value: Normal
+product-area-priorities:
+  high-product-area-name: 0
+  low-product-area-name: 3

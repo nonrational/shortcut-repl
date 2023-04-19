@@ -40,11 +40,20 @@ namespace :project_sync do
   end
 end
 
-desc "Export the config.yml file as a base64 encoded string"
-task :export_config do
-  load_paths!
-  config = Base64.encode64(YAML.load_file("config.yml").to_s).tr("\n", "")
-  puts "export SCRB_CONFIG='#{config}'"
+namespace :config do
+  desc "Export the config.yml file as a base64 encoded string"
+  task :export do
+    load_paths!
+    config = Base64.encode64(File.read("config.yml")).tr("\n", "")
+    puts "export SCRB_CONFIG='#{config}'"
+  end
+
+  desc "Check config is valid"
+  task :check do
+    load_paths!
+    necessary_keys = YAML.load_file("config.yml.example").keys
+    raise "bad" unless Scrb.config.keys.sort == necessary_keys.sort
+  end
 end
 
 namespace :iteration_ready_sort do

@@ -1,0 +1,17 @@
+name: sort-current-iteration
+on:
+  # for testing only
+  push: '*'
+  workflow_dispatch:
+  schedule:
+    # Run daily at 5am UTC
+    - cron: "0 5 * * *"
+
+jobs:
+  sort:
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+      - run: rake config:check

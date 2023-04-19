@@ -27,23 +27,36 @@ module Scrb
     end
 
     def default_priority_custom_field
-      @default_priority_custom_field ||= priority_custom_field.find_value_by_name(config["default-priority-value"])
+      @default_priority_custom_field ||= priority_custom_field.find_value_by_name(fetch_config!["default-priority-value"])
     end
 
     def ready_state_name
-      @ready_for_name ||= config["ready-state-name"] || "Ready"
+      @ready_for_name ||= fetch_config!["ready-state-name"]
     end
 
     def workflow_name
-      @workflow_name ||= config["workflow-name"] || "Product"
+      @workflow_name ||= fetch_config!["workflow-name"]
     end
 
     def config
-      @config ||= ENV["SCRB_CONFIG"].present? ? YAML.load(ENV["SCRB_CONFIG"]) : YAML.load_file("config.yml")
+      @config ||= begin
+        if ENV["SCRB_CONFIG"].present?
+          YAML.load(Base64.decode64(ENV["SCRB_CONFIG"]))
+        else
+          YAML.load_file("config.yml")
+        end
+      rescue Psych::SyntaxError
+        raise "Uh oh! Invalid YAML in #{ENV["SCRB_CONFIG"].present? ? "SCRB_CONFIG" : "config.yml"}."
+      end
     end
 
     def ready_state
-      @ready_state ||= ::ScrbClient.get("/workflows").find { |w| w["name"] == config["workflow-name"] }["states"].find { |s| s["name"].match(/#{ready_state_name}/i) }
+      @ready_state ||= Workflow.default["states"].find { |s| s["name"].match(/#{ready_state_name}/i) }
+    end
+
+    def fetch_config!(key)
+      raise "Uh oh! Missing config key '#{key}'." unless config[key].present?
+      config[key]
     end
   end
 end
