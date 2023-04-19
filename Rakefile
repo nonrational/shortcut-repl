@@ -53,6 +53,7 @@ namespace :config do
     load_paths!
     necessary_keys = YAML.load_file("config.yml.example").keys
     raise "bad" unless Scrb.config.keys.sort == necessary_keys.sort
+    puts "Looks good!"
   end
 end
 
