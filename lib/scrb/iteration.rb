@@ -61,11 +61,15 @@ module Scrb
       end
 
       def find_by_name(name)
-        all.find { |i| i.name.match(/#{name}/i) }
+        search('"' + name + '"').first
       end
 
       def all
         ::Scrb.shortcut.iterations.list[:content].map { |h| Iteration.new(h) }
+      end
+
+      def next(count)
+        all.reject(&:finished?).sort_by { |e| e.start_date }.first(count)
       end
 
       def find_current
@@ -82,6 +86,10 @@ module Scrb
 
       def find_unstarted_by_name(name)
         all.select(&:unstarted?).find { |i| i.name.match(/#{name}/i) }
+      end
+
+      def search(query)
+        IterationSearch.new(query: query).tap(&:fetch_all).iterations
       end
     end
 

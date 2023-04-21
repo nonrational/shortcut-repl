@@ -21,7 +21,7 @@ namespace :iteration do
   task :preview do
     load_paths!
     curr = Scrb::Iteration.find_futuremost
-    6.times { puts curr = curr.build_next }
+    3.times { puts curr = curr.build_next }
   end
 
   desc "Create the next iteration"
@@ -29,6 +29,29 @@ namespace :iteration do
     load_paths!
     curr = Scrb::Iteration.find_futuremost
     curr.build_next.save
+  end
+
+  namespace :ready_sort do
+    desc "Sort all the stories in the ready column in the current iteration by epic and priority"
+    task :run do
+      load_paths!
+      Scrb::IterationReadySort.new.run
+    end
+
+    task :check do
+      load_paths!
+      Scrb::Iteration.next(3).each do |iteration|
+        sort = Scrb::IterationReadySort.new(iteration: iteration)
+        result_char = sort.sorted? ? "✅" : "❌"
+        puts "#{result_char} – #{sort.iteration.name}"
+      end
+    end
+
+    desc "Preview the stories that would be sorted in the ready column in the current iteration by epic and priority"
+    task :preview do
+      load_paths!
+      puts Scrb::IterationReadySort.new.preview
+    end
   end
 end
 
@@ -54,19 +77,5 @@ namespace :config do
     necessary_keys = YAML.load_file("config.yml.example").keys
     raise "bad" unless Scrb.config.keys.sort == necessary_keys.sort
     puts "Looks good!"
-  end
-end
-
-namespace :iteration_ready_sort do
-  desc "Sort all the stories in the ready column in the current iteration by epic and priority"
-  task :run do
-    load_paths!
-    Scrb::IterationReadySort.new.run
-  end
-
-  desc "Preview the stories that would be sorted in the ready column in the current iteration by epic and priority"
-  task :preview do
-    load_paths!
-    puts Scrb::IterationReadySort.new.preview
   end
 end

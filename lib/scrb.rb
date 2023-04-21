@@ -27,15 +27,15 @@ module Scrb
     end
 
     def default_priority_custom_field
-      @default_priority_custom_field ||= priority_custom_field.find_value_by_name(fetch_config!["default-priority-value"])
+      @default_priority_custom_field ||= priority_custom_field.find_value_by_name(fetch_config!("default-priority-value"))
     end
 
     def ready_state_name
-      @ready_for_name ||= fetch_config!["ready-state-name"]
+      @ready_for_name ||= fetch_config!("ready-state-name")
     end
 
     def workflow_name
-      @workflow_name ||= fetch_config!["workflow-name"]
+      @workflow_name ||= fetch_config!("workflow-name")
     end
 
     def config
@@ -51,7 +51,7 @@ module Scrb
     end
 
     def ready_state
-      @ready_state ||= Workflow.default["states"].find { |s| s["name"].match(/#{ready_state_name}/i) }
+      @ready_state ||= Workflow.default.workflow_states.find { |s| s.name.match(/#{ready_state_name}/i) }
     end
 
     def fetch_config!(key)

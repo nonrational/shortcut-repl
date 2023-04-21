@@ -28,17 +28,26 @@ module Scrb
     # for debugging purposes only
     def preview
       sorted_stories.map do |s|
-        [s.id, s.name, epic_product_area_position(s)].join(" - ")
-        # [s.name, s.priority_position + story_type_position(s), epic_product_area_position(s), s.priority&.name, s.product_area&.name, s.story_type]
+        [s.id, s.name, epic_product_area_position(s), sort_order_for(s)].join(" - ")
       end
     end
 
     def sort_order_for(story)
       [
-        story.priority_position + story_type_position(story),
+        story.priority_position + story_type_position(story) + story_blocked_modfiier(story),
         epic_product_area_position(story),
         story.id
       ]
+    end
+
+    def story_blocked_modfiier(story)
+      if story.blocked?
+        1
+      elsif story.blocker?
+        -1
+      else
+        0
+      end
     end
 
     def story_type_position(story)

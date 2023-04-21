@@ -56,7 +56,7 @@ module Scrb
       self.has_more_items = result["next"].present?
       self.next_token = CGI.parse(URI.parse(result["next"]).query)["next"].first if has_more_items
 
-      curr_items = result["data"].map { |s| Story.new(s) }
+      curr_items = result["data"].map { |s| item_class.new(s) }
 
       items.push(*curr_items)
 

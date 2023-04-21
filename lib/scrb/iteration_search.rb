@@ -1,16 +1,16 @@
 module Scrb
-  class EpicSearch
+  class IterationSearch
     include ActiveModel::Model
     include Scrb::Searchable
 
     def search_path
-      "/search/epics"
+      "/search/iterations"
     end
 
     def item_class
-      Scrb::Epic
+      Scrb::Iteration
     end
 
-    alias_method :epics, :items
+    alias_method :iterations, :items
   end
 end
