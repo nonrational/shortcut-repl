@@ -24,6 +24,7 @@ namespace :iteration do
     3.times { puts curr = curr.build_next }
   end
 
+  desc "Move all unfinished stories from the previous iteration to the current iteration"
   task :cutover do
     load_paths!
     cutover = Scrb::BulkUnfinishedStoryMigration.new
@@ -35,6 +36,8 @@ namespace :iteration do
   task :create_next do
     load_paths!
     curr = Scrb::Iteration.find_futuremost
+    next_iteration = curr.build_next
+    puts "Creating #{next_iteration.name} from #{next_iteration.start_date} to #{next_iteration.end_date}"
     curr.build_next.save
   end
 
