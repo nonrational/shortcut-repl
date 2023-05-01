@@ -24,6 +24,13 @@ namespace :iteration do
     3.times { puts curr = curr.build_next }
   end
 
+  task :cutover do
+    load_paths!
+    cutover = Scrb::BulkUnfinishedStoryMigration.new
+    puts "Moving #{cutover.incomplete_stories.count} unfinished stories from #{cutover.previous_iteration.name} to #{cutover.current_iteration.name}"
+    cutover.run
+  end
+
   desc "Create the next iteration"
   task :create_next do
     load_paths!
