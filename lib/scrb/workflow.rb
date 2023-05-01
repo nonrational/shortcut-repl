@@ -25,6 +25,10 @@ module Scrb
     class WorkflowState
       include ActiveModel::Model
       attr_accessor :description, :entity_type, :verb, :name, :global_id, :num_stories, :type, :updated_at, :id, :num_story_templates, :position, :created_at
+
+      def name_ilike?(pattern)
+        name.match(/#{pattern}/i)
+      end
     end
   end
 end

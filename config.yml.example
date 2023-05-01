@@ -2,6 +2,7 @@ project-product-areas:
   project-name: product-area-name
 workflow-name: Default
 ready-state-name: "Ready for Work"
+stale-state-name: "Deploying"
 default-priority-value: Normal
 product-area-priorities:
   high-product-area-name: 0

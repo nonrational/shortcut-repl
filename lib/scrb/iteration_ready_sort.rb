@@ -34,13 +34,13 @@ module Scrb
 
     def sort_order_for(story)
       [
-        story.priority_position + story_type_position(story) + story_blocked_modfiier(story),
+        story.priority_position + story_type_modifier(story) + story_blocked_modifier(story),
         epic_product_area_position(story),
         story.id
       ]
     end
 
-    def story_blocked_modfiier(story)
+    def story_blocked_modifier(story)
       if story.blocked?
         1
       elsif story.blocker?
@@ -50,7 +50,7 @@ module Scrb
       end
     end
 
-    def story_type_position(story)
+    def story_type_modifier(story)
       {
         feature: 0,
         bug: -1,

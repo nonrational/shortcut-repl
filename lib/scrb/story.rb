@@ -33,6 +33,10 @@ module Scrb
       @workflow ||= Workflow.find(workflow_id)
     end
 
+    def in_workflow_state?(states)
+      Array(states).map(&:id).include?(workflow_state_id)
+    end
+
     def workflow_state
       @workflow_state ||= workflow.workflow_states.find { |s| s.id == workflow_state_id }
     end
