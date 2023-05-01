@@ -1,27 +1,32 @@
 require "table_print"
 module Scrb
   class IterationKickoffReport
-    def print
+    include ActiveModel::Model
+
+    def print(format = :table)
       tp.set :max_width, 60
 
-      tp epics_with_cards_in_iteration.map { |e| epic_to_csv_row(e) }
-
-      tp stories_in_iteration_without_epics.map { |e| story_to_csv_row(e) }
+      if format == :csv
+        puts epic_to_csv_row(epics_with_cards_in_iteration.first).keys.join("|")
+        puts epics_with_cards_in_iteration.map { |e| epic_to_csv_row(e).values.join("|") }.join("\n")
+        puts stories_in_iteration_without_epics.map { |e| story_to_csv_row(e).values.join("|") }.join("\n")
+      else
+        puts "Fetching stories for iteration #{Scrb.current_iteration.name}..."
+        tp stories_in_iteration_without_epics.map { |e| story_to_csv_row(e) }
+        tp epics_with_cards_in_iteration.map { |e| epic_to_csv_row(e) }
+      end
     end
 
     def story_to_csv_row(s)
-      {type: "story", app_url: " #{s.app_url} ", name: s.name, owners: s.owner_members.map { |m| m&.first_name }.join(" / "), state: s.workflow_state&.name, target: "N/A"}
+      {type: "story", app_url: s.app_url, name: s.name, owners: s.owner_members.map { |m| m&.first_name }.join(" / "), state: s.workflow_state&.name, target: "N/A"}
     end
 
     def epic_to_csv_row(e)
-      {type: "epic", app_url: " #{e.app_url} ", name: e.name, owners: e.owner_members.map { |m| m&.first_name }.join(" / "), state: e.workflow_state&.name, target: "N/A"}
+      {type: "epic", app_url: e.app_url, name: e.name, owners: e.owner_members.map { |m| m&.first_name }.join(" / "), state: e.workflow_state&.name, target: "N/A"}
     end
 
     def current_iteration_stories
-      @current_iteration_stories ||= begin
-        puts "Fetching stories for iteration #{Scrb.current_iteration.name}..."
-        Scrb.current_iteration.stories
-      end
+      @current_iteration_stories ||= Scrb.current_iteration.stories
     end
 
     def stories_in_iteration_without_epics

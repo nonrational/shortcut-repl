@@ -32,6 +32,12 @@ namespace :iteration do
     cutover.run
   end
 
+  desc "Print a pipe delimited list of all epics that have work scheduled in the current iteration"
+  task :kickoff do
+    load_paths!
+    Scrb::IterationKickoffReport.new.print(:csv)
+  end
+
   desc "Create the next iteration"
   task :create_next do
     load_paths!
