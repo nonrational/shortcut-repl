@@ -2,7 +2,13 @@ module Scrb
   class Story
     include ActiveModel::Model
 
-    attr_accessor :app_url, :archived, :blocked, :blocker, :branches, :comment_ids, :comments, :commits, :completed, :completed_at, :completed_at_override, :created_at, :custom_fields, :cycle_time, :deadline, :description, :entity_type, :epic_id, :estimate, :external_id, :external_links, :file_ids, :files, :follower_ids, :global_id, :group_id, :group_mention_ids, :id, :iteration_id, :label_ids, :labels, :lead_time, :linked_file_ids, :linked_files, :member_mention_ids, :mention_ids, :moved_at, :name, :num_tasks_completed, :owner_ids, :position, :previous_iteration_ids, :project_id, :pull_requests, :requested_by_id, :started, :started_at, :started_at_override, :stats, :story_links, :story_template_id, :story_type, :task_ids, :tasks, :updated_at, :workflow_id, :workflow_state_id
+    attr_accessor :app_url, :archived, :blocked, :blocker, :branches, :comment_ids, :comments, :commits, :completed,
+      :completed_at, :completed_at_override, :created_at, :custom_fields, :cycle_time, :deadline, :description,
+      :entity_type, :epic_id, :estimate, :external_id, :external_links, :file_ids, :files, :follower_ids, :global_id,
+      :group_id, :group_mention_ids, :id, :iteration_id, :label_ids, :labels, :lead_time, :linked_file_ids, :linked_files,
+      :member_mention_ids, :mention_ids, :moved_at, :name, :num_tasks_completed, :owner_ids, :position, :previous_iteration_ids,
+      :project_id, :pull_requests, :requested_by_id, :started, :started_at, :started_at_override, :stats, :story_links,
+      :story_template_id, :story_type, :task_ids, :tasks, :updated_at, :workflow_id, :workflow_state_id
 
     alias_method :blocked?, :blocked
     alias_method :blocker?, :blocker

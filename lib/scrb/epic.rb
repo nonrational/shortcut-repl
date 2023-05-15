@@ -56,6 +56,10 @@ module Scrb
       end
     end
 
+    def roadmap?
+      labels.any? { |l| l["name"].match(/roadmap\z/i) }
+    end
+
     def workflow_state
       @workflow_states ||= EpicWorkflow.fetch.epic_states.find { |es| es.id == epic_state_id }
     end

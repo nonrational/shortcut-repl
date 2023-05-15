@@ -35,9 +35,14 @@ module Scrb
     def sort_order_for(story)
       [
         story.priority_position + story_type_modifier(story) + story_blocked_modifier(story),
+        story_deadline_rank(story),
         epic_product_area_position(story),
         story.id
       ]
+    end
+
+    def story_deadline_rank(story)
+      story.deadline.present? ? -1 : 1
     end
 
     def story_blocked_modifier(story)
