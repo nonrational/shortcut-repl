@@ -3,9 +3,9 @@ on:
   # # for testing only
   # push:
   #   branches: ['*']
-  schedule:
+  # schedule:
     # Run daily at 5am UTC
-    - cron: "0 5 * * *"
+    # - cron: "0 5 * * *"
     
   workflow_dispatch:
 
