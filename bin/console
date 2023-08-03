@@ -12,17 +12,39 @@ require "shortcut_ruby"
 require "dotenv/load"
 
 def load_paths!
-  path = File.expand_path("../..", __FILE__)
-  files = Dir.glob("#{path}/**/*.rb").sort
-  files.each do |f|
-    # puts f
+  lib_files.each do |f|
+    puts f
+    pre_constants = Object.constants
     load f
+    @defined_constants = defined_constants.merge(Object.constants - pre_constants)
   end
-  files.length
+
+  defined_constants
+end
+
+def defined_constants
+  @defined_constants ||= [].to_set
+end
+
+def lib_files
+  path = File.expand_path("../..", __FILE__)
+
+  [
+    'lib/scrb/behaviors',
+    'lib/scrb/models',
+    'lib/scrb/models/custom_fields',
+    'lib/scrb/tasks',
+    'lib/scrb',
+    'lib',
+  ].flat_map do |dir|
+    Dir.glob("#{path}/#{dir}/*.rb")
+  end
 end
 
 def reload!
-  Object.send(:remove_const, :Scrb)
+  defined_constants.each do |const_name|
+    Object.send(:remove_const, const_name)
+  end
   load_paths!
 end
 

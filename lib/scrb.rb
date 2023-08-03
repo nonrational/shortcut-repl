@@ -7,7 +7,7 @@ require "base64"
 module Scrb
   class << self
     def shortcut
-      ShortcutRuby::Shortcut.new(ENV.fetch("SHORTCUT_API_TOKEN"))
+      ShortcutRuby::Shortcut.new(api_key)
     end
 
     def current_iteration
@@ -36,6 +36,10 @@ module Scrb
 
     def workflow_name
       @workflow_name ||= fetch_config!("workflow-name")
+    end
+
+    def api_key
+      @api_key ||= config["api-key"] || ENV.fetch("SHORTCUT_API_TOKEN")
     end
 
     def config
