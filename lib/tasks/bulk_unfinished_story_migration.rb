@@ -1,4 +1,4 @@
-class Scrb::BulkUnfinishedStoryMigration
+class BulkUnfinishedStoryMigration
   include ActiveModel::Model
 
   def run
@@ -20,10 +20,10 @@ class Scrb::BulkUnfinishedStoryMigration
   end
 
   def previous_iteration
-    @previous_iteration ||= Scrb::Iteration.find_previous
+    @previous_iteration ||= Iteration.find_previous
   end
 
   def current_iteration
-    @current_iteration ||= Scrb::Iteration.find_current
+    @current_iteration ||= Iteration.find_current
   end
 end

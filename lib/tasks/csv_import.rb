@@ -1,4 +1,4 @@
-class Scrb::CsvImport
+class CsvImport
   include ActiveModel::Model
 
   attr_writer :filepath

@@ -20,14 +20,14 @@ namespace :iteration do
   desc "Preview the next handful iteration start/end dates"
   task :preview do
     load_paths!
-    curr = Scrb::Iteration.find_futuremost
+    curr = Iteration.find_futuremost
     3.times { puts curr = curr.build_next }
   end
 
   desc "Move all unfinished stories from the previous iteration to the current iteration"
   task :cutover do
     load_paths!
-    cutover = Scrb::BulkUnfinishedStoryMigration.new
+    cutover = BulkUnfinishedStoryMigration.new
     puts "Moving #{cutover.incomplete_stories.count} unfinished stories from #{cutover.previous_iteration.name} to #{cutover.current_iteration.name}"
     cutover.run
   end
@@ -35,13 +35,13 @@ namespace :iteration do
   desc "Print a pipe delimited list of all epics that have work scheduled in the current iteration"
   task :kickoff do
     load_paths!
-    Scrb::IterationKickoffReport.new.print(:csv)
+    IterationKickoffReport.new.print(:csv)
   end
 
   desc "Create the next iteration"
   task :create_next do
     load_paths!
-    curr = Scrb::Iteration.find_futuremost
+    curr = Iteration.find_futuremost
     next_iteration = curr.build_next
     puts "Creating #{next_iteration.name} from #{next_iteration.start_date} to #{next_iteration.end_date}"
     curr.build_next.save
@@ -51,13 +51,13 @@ namespace :iteration do
     desc "Sort all the stories in the ready column in the current iteration by epic and priority"
     task :run do
       load_paths!
-      Scrb::IterationReadySort.new.run
+      IterationReadySort.new.run
     end
 
     task :check do
       load_paths!
-      Scrb::Iteration.next(3).each do |iteration|
-        sort = Scrb::IterationReadySort.new(iteration: iteration)
+      Iteration.next(3).each do |iteration|
+        sort = IterationReadySort.new(iteration: iteration)
         result_char = sort.sorted? ? "✅" : "❌"
         puts "#{result_char} – #{sort.iteration.name}"
       end
@@ -66,7 +66,7 @@ namespace :iteration do
     desc "Preview the stories that would be sorted in the ready column in the current iteration by epic and priority"
     task :preview do
       load_paths!
-      puts Scrb::IterationReadySort.new.preview
+      puts IterationReadySort.new.preview
     end
   end
 end
@@ -75,7 +75,7 @@ namespace :project_sync do
   desc "Ensure that all stories with a project have the correct product area set"
   task :run do
     load_paths!
-    Scrb::BulkProjectSync.new.run
+    BulkProjectSync.new.run
   end
 end
 
@@ -90,8 +90,10 @@ namespace :config do
   desc "Check config is valid"
   task :check do
     load_paths!
-    necessary_keys = YAML.load_file("config.yml.example").keys
-    raise "bad" unless Scrb.config.keys.sort == necessary_keys.sort
+    expected_keys = YAML.load_file("config.yml.example").keys.to_set
+    actual_keys = Scrb.config.keys.to_set
+
+    raise "missing keys: #{(expected_keys - actual_keys).to_a.join(",")}" unless actual_keys.superset?(expected_keys)
     puts "Looks good!"
   end
 end

@@ -18,8 +18,6 @@ def load_paths!
     load f
     @defined_constants = defined_constants.merge(Object.constants - pre_constants)
   end
-
-  defined_constants
 end
 
 def defined_constants
@@ -30,11 +28,10 @@ def lib_files
   path = File.expand_path("../..", __FILE__)
 
   [
-    'lib/scrb/behaviors',
-    'lib/scrb/models',
-    'lib/scrb/models/custom_fields',
-    'lib/scrb/tasks',
-    'lib/scrb',
+    'lib/behaviors',
+    'lib/models',
+    'lib/models/custom_fields',
+    'lib/tasks',
     'lib',
   ].flat_map do |dir|
     Dir.glob("#{path}/#{dir}/*.rb")

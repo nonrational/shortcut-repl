@@ -1,4 +1,4 @@
-class Scrb::BulkMissingIterationAssignment
+class BulkMissingIterationAssignment
   include ActiveModel::Model
 
   def run

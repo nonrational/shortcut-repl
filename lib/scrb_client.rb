@@ -1,4 +1,5 @@
 require "httparty"
+
 class ScrbClient
   include HTTParty
 

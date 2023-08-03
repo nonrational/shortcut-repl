@@ -11,11 +11,11 @@ module Scrb
     end
 
     def current_iteration
-      @current_iteration ||= Scrb::Iteration.find_current
+      @current_iteration ||= Iteration.find_current
     end
 
     def iterations
-      @iterations ||= Scrb::Iteration.all
+      @iterations ||= Iteration.all
     end
 
     def product_area_custom_field
