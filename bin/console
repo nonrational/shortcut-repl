@@ -40,7 +40,11 @@ end
 
 def reload!
   defined_constants.each do |const_name|
-    Object.send(:remove_const, const_name)
+    begin
+      Object.send(:remove_const, const_name)
+    rescue e
+      puts "Ignoring #{e}"
+    end
   end
   load_paths!
 end
