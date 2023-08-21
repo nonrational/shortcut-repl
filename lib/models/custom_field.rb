@@ -1,18 +1,26 @@
 class CustomField
   include ActiveModel::Model
-  attr_accessor :id, :name, :description, :entity_type, :fixed_position, :updated_at, :field_type,
-    :position, :canonical_name, :enabled, :created_at, :values, :story_types
+  attr_accessor :description, :entity_type, :name, :fixed_position, :updated_at, :id, :values,
+    :field_type, :position, :canonical_name, :enabled, :created_at, :story_types, :icon_set_identifier
 
-  def self.all
-    ScrbClient.get("/custom-fields").map { |r| CustomField.new(r) }
-  end
+  class << self
+    def all
+      ScrbClient.get("/custom-fields").map { |r| CustomField.new(r) }
+    end
 
-  def self.enabled
-    all.filter(&:enabled)
-  end
+    def remote_attributes
+      fields = Set[]
+      ScrbClient.get("/custom-fields").each { |cf| fields.merge(cf.keys) }
+      fields.map(&:to_sym)
+    end
 
-  def self.find_field(name_pattern)
-    all.find { |f| f.name.match(/#{name_pattern}/i) }
+    def enabled
+      all.filter(&:enabled)
+    end
+
+    def find_field(name_pattern)
+      all.find { |f| f.name.match(/#{name_pattern}/i) }
+    end
   end
 
   class Value
