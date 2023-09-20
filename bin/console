@@ -42,7 +42,7 @@ def reload!
   defined_constants.each do |const_name|
     begin
       Object.send(:remove_const, const_name)
-    rescue e
+    rescue => e
       puts "Ignoring #{e}"
     end
   end
