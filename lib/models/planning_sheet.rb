@@ -29,7 +29,7 @@ class PlanningSheet
   end
 
   def sheet_id
-    Scrb.fetch_config!("planning-sheet-id")
+    Scrb.fetch_config!("planning-sheet-ranges")
   end
 
   def ranges
@@ -37,19 +37,6 @@ class PlanningSheet
   end
 
   def auth_client
-    @auth_client ||= begin
-      client_opts = JSON.parse(File.read("./google_credentials.json"))
-      auth_client = Signet::OAuth2::Client.new(client_opts)
-
-      # if the configured auth client is no longer valid, use the refresh token
-      # and write the resulting credentials back to the JSON
-      if Time.now.after?(auth_client.expires_at)
-        puts "Refreshing Google Credentials..."
-        auth_client.refresh!
-        File.write("./google_credentials.json", auth_client.to_json)
-      end
-
-      auth_client
-    end
+    @auth_client ||= GoogleCredentials.load!
   end
 end

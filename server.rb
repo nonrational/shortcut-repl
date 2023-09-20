@@ -6,25 +6,23 @@ require "dotenv/load"
 require "google/api_client/client_secrets"
 require "json"
 require "sinatra"
-
-creds_path = "./google_credentials.json"
-
-puts "http://localhost:4567"
+require_relative "./lib/models/google_credentials"
 
 get "/" do
-  redirect to("/oauth2callback") unless File.exist?(creds_path)
+  redirect to("/oauth2callback") unless GoogleCredentials.exist?
 
-  creds = JSON.parse(File.read(creds_path))
-  expires_at = Time.at(creds["expires_at"]).to_datetime
-  remaining = ((expires_at - DateTime.now) * 1440).to_i
+  creds = GoogleCredentials.load!
 
-  redirect to("/oauth2refresh") if remaining < 0
+  redirect to("/oauth2refresh") if creds.expired?
 
-  scope_items = creds["scope"].map { |s| "<li>#{s}</li>" }
+  scope_items = creds.scope.map { |s| "<li>#{s}</li>" }
 
   "
   <p>
-  #{remaining} minutes remaining. <a href='/oauth2refresh'>Refresh now</a>.
+  #{creds.minutes_remaining} minutes remaining. <a href='/oauth2refresh'>Refresh now</a>.
+  </p>
+  <p>
+  Scopes:
   <ul>
   #{scope_items.join}
   </ul>
@@ -33,10 +31,7 @@ get "/" do
 end
 
 get "/oauth2refresh" do
-  client_opts = JSON.parse(File.read(creds_path))
-  auth_client = Signet::OAuth2::Client.new(client_opts)
-  auth_client.refresh!
-  File.write(creds_path, auth_client.to_json)
+  GoogleCredentials.load!.tap(&:refresh!).tap(&:store!)
   redirect to("/")
 end
 
@@ -58,7 +53,7 @@ get "/oauth2callback" do
     creds_json = auth_client.to_json
 
     session[:credentials] = creds_json
-    File.write(creds_path, creds_json)
+    File.write(GoogleCredentials.json_path, creds_json)
 
     redirect to("/")
   end
