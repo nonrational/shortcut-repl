@@ -1,6 +1,6 @@
 # shortcut-repl
 
-A REPL wrapper for `shortcut_ruby` to help automate stuff.
+A REPL wrapper for [Shortcut](https://www.shortcut.com/) to help automate stuff.
 
 ## Summary
 
@@ -21,7 +21,16 @@ rake project_sync:run              # Ensure that all stories with a project have
 
 See `config.yml.example`
 
+### Rake Completion via Homebrew
+
+```sh
+brew install bash bash-completion
+curl -o "$(brew --prefix)/etc/bash_completion.d/rake" \
+    "https://raw.githubusercontent.com/ai/rake-completion/e46866ebf5d2e0d5b8cb3f03bae6ff98f22a2899/rake"
+```
+
 ## Automation via GitHub Actions
 
 Once you've got everything configured in `config.yml`, run `rake config:export` to produce a base64'd version suitable to drop into your ENV.
+
 
