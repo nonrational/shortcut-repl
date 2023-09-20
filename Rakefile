@@ -97,3 +97,11 @@ namespace :config do
     puts "Looks good!"
   end
 end
+
+namespace :planning do
+  desc "Check that the names on the sheet match their epics"
+  task :name_check do
+    load_paths!
+    PlanningSheet.check
+  end
+end

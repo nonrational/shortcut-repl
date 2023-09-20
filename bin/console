@@ -13,11 +13,12 @@ require "dotenv/load"
 
 def load_paths!
   lib_files.each do |f|
-    puts f
+    # puts f
     pre_constants = Object.constants
     load f
     @defined_constants = defined_constants.merge(Object.constants - pre_constants)
   end
+  :ok
 end
 
 def defined_constants
