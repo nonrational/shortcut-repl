@@ -2,3 +2,4 @@
 *.csv
 .rake_tasks~
 config.yml
+*.json
