@@ -10,6 +10,10 @@ module Scrb
       ShortcutRuby::Shortcut.new(api_key)
     end
 
+    def current_epics
+      @current_epics ||= Epic.search("!is:archived !is:done")
+    end
+
     def current_iteration
       @current_iteration ||= Iteration.find_current
     end

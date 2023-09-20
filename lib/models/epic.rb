@@ -24,7 +24,7 @@ class Epic
     :productboard_plugin_id, :started_at, :completed_at, :name, :global_id, :completed, :productboard_url, :state,
     :milestone_id, :requested_by_id, :epic_state_id, :label_ids, :started_at_override, :group_id, :updated_at,
     :group_mention_ids, :productboard_id, :follower_ids, :owner_ids, :external_id, :id, :position, :productboard_name,
-    :stats, :created_at
+    :stats, :created_at, :objective_ids
 
   attr_reader :planned_start_date, :deadline
 
@@ -44,6 +44,7 @@ class Epic
   alias_method :archived?, :archived
   alias_method :started?, :started
   alias_method :completed?, :completed
+  alias_method :target_date, :deadline
 
   def owner_members
     @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
