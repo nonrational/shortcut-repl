@@ -15,16 +15,14 @@ get "/" do
 
   redirect to("/oauth2refresh") if creds.expired?
 
-  scope_items = creds.scope.map { |s| "<li>#{s}</li>" }
-
   "
   <p>
   #{creds.minutes_remaining} minutes remaining. <a href='/oauth2refresh'>Refresh now</a>.
   </p>
   <p>
-  Scopes:
+  Granted scopes:
   <ul>
-  #{scope_items.join}
+  #{creds.granted_scopes.map { |s| "<li>#{s}</li>" }.join}
   </ul>
   </p>
   "

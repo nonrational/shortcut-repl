@@ -1,21 +1,22 @@
 # An initiative represents a line-item in a planning spreadsheet and a corresponding shortcut epic.
 class SheetInitiative
-  attr_reader :row
+  include ActiveModel::Model
+  attr_accessor :row_data, :row_index, :spreadsheet_id, :spreadsheet_range, :sheet_name
 
-  def initialize(raw_row)
-    @row = SheetRow.new(raw_row)
+  def row
+    @row ||= SheetRow.new(row_data: row_data, row_index: row_index, sheet_name: sheet_name)
   end
 
   def story?
-    /story-/.match?(row.raw_shortcut_id)
+    /story-/.match?(row.shortcut_id)
   end
 
   def epic?
-    /epic-/.match?(row.raw_shortcut_id)
+    /epic-/.match?(row.shortcut_id)
   end
 
   def epic_id
-    @epic_id ||= row.raw_shortcut_id.split("-")[1].to_i if epic?
+    @epic_id ||= row.shortcut_id.split("-")[1].to_i if epic?
   end
 
   def epic
@@ -24,6 +25,41 @@ class SheetInitiative
 
   def any_mismatch?
     !name_match? or !state_match? or !target_date_match?
+  end
+
+  def move_document_to_correct_drive_location
+    # We tend to write documents and then share them with the right audience.
+  end
+
+  def sheets_v4
+    @sheets_v4 ||= Google::Apis::SheetsV4::SheetsService.new
+  end
+
+  def auth_client
+    @auth_client ||= GoogleCredentials.load!
+  end
+
+  def copy_epic_name_to_sheet
+    range_name = "Initiatives!B#{@row_index}"  # Adjust this if you're working with a different sheet name.
+
+    row.shortcut_link
+
+    # Create the request with the hyperlinked value
+    value_range = Google::Apis::SheetsV4::ValueRange.new(
+      range: row.cell_range_name(:B),
+      values: [
+        ["=HYPERLINK(\"#{row.shortcut_link}\", \"#{epic.name}\")"]  # This sets the value of B2 to a hyperlink.
+      ]
+    )
+
+    sheets_v4.update_spreadsheet_value(spreadsheet_id, range_name, value_range, value_input_option: "RAW", options: {authorization: auth_client})
+  end
+
+  def synchronize
+    # prefer names from epics
+    # prefer states from sheet
+    # prefer target_dates from sheet
+    # maybe check which one was updated more recently?
   end
 
   def sync_epic!
@@ -71,9 +107,9 @@ class SheetInitiative
 
   def to_s
     if epic.present?
-      ["epic", epic.id, epic.name, row.target_date, epic.target_date&.to_date&.iso8601].join(",")
+      ["epic", epic.number, epic.name, row.target_date, epic.target_date&.to_date&.iso8601].join(",")
     elsif epic?
-      ["epic", row.raw_shortcut_id, "ERR!", nil, nil].join(",")
+      ["epic", row.shortcut_id, "ERR!", nil, nil].join(",")
     elsif story?
       ["story", "ERR!", "ERR!", nil, nil].join(",")
     else

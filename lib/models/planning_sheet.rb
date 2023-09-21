@@ -13,7 +13,17 @@ class PlanningSheet
   end
 
   def initiatives
-    @initiatives ||= sheet.data[0].row_data.map { |row| SheetInitiative.new(row) }.filter(&:epic?).filter { |si| si.epic.present? }
+    @initiatives ||= begin
+      sheet.data[0].row_data.drop(1).map.with_index do |row, idx|
+        SheetInitiative.new(
+          row_data: row,
+          row_index: idx + 2, # google sheets use 1-based numbering, and we dropped the index.
+          spreadsheet_id: spreadsheet_id,
+          spreadsheet_range: spreadsheet_range,
+          sheet_name: spreadsheet_range.split("!").first
+        )
+      end.filter(&:epic?).filter { |si| si.epic.present? }
+    end
   end
 
   def sheets_v4
@@ -25,15 +35,15 @@ class PlanningSheet
   end
 
   def spreadsheet
-    @spreadsheet ||= sheets_v4.get_spreadsheet(sheet_id, include_grid_data: true, ranges: ranges, options: {authorization: auth_client})
+    @spreadsheet ||= sheets_v4.get_spreadsheet(spreadsheet_id, include_grid_data: true, ranges: [spreadsheet_range], options: {authorization: auth_client})
   end
 
-  def sheet_id
+  def spreadsheet_id
     Scrb.fetch_config!("planning-sheet-id")
   end
 
-  def ranges
-    Scrb.fetch_config!("planning-sheet-ranges")
+  def spreadsheet_range
+    Scrb.fetch_config!("planning-sheet-range")
   end
 
   def auth_client

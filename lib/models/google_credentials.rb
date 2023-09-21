@@ -16,6 +16,8 @@ class GoogleCredentials < Signet::OAuth2::Client
           creds.refresh!
           creds.store!
         end
+
+        puts "Token valid for #{creds.minutes_remaining} minutes"
       end
     end
   end
