@@ -40,19 +40,21 @@ class SheetInitiative
   end
 
   def copy_epic_name_to_sheet
-    range_name = "Initiatives!B#{@row_index}"  # Adjust this if you're working with a different sheet name.
-
-    row.shortcut_link
-
     # Create the request with the hyperlinked value
     value_range = Google::Apis::SheetsV4::ValueRange.new(
-      range: row.cell_range_name(:B),
+      range: row.cell_range_by_column_name(:hyperlinked_name),
       values: [
-        ["=HYPERLINK(\"#{row.shortcut_link}\", \"#{epic.name}\")"]  # This sets the value of B2 to a hyperlink.
+        ["=HYPERLINK(\"#{row.name_hyperlink}\", \"#{epic.name}\")"]  # This sets the value of B2 to a hyperlink.
       ]
     )
 
-    sheets_v4.update_spreadsheet_value(spreadsheet_id, range_name, value_range, value_input_option: "RAW", options: {authorization: auth_client})
+    sheets_v4.update_spreadsheet_value(
+      spreadsheet_id,
+      row.cell_range_by_column_name(:hyperlinked_name),
+      value_range,
+      value_input_option: "USER_ENTERED",
+      options: {authorization: auth_client}
+    )
   end
 
   def synchronize

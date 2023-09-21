@@ -6,8 +6,12 @@ class SheetRow
   # A	    B	    C	  D	        E	    F	      G       H	    I	      J	    K	  L	            M N O	P	      Q       R	  S
   # index	Name	Doc	Shortcut	Owner	Urgency	Status	Begin	Target	Start	End	Last Mention	P	D	E	Source	Design	Eng	Notes
 
-  def cell_range_name(col)
-    [sheet_name, "!", col.to_s.upcase, row_index].join
+  def cell_range_by_column_index(col_alpha)
+    [sheet_name, "!", col_alpha.to_s.upcase, row_index].join
+  end
+
+  def cell_range_by_column_name(col_name)
+    cell_range_by_column_index(column_map[col_name.to_sym])
   end
 
   def number
@@ -22,11 +26,11 @@ class SheetRow
     fetch(:hyperlinked_name).hyperlink
   end
 
-  def doc_type
+  def doctype
     etch(:hyperlinked_doctype).formatted_value
   end
 
-  def doc_hyperlink
+  def doctype_hyperlink
     fetch(:hyperlinked_doctype).hyperlink
   end
 
