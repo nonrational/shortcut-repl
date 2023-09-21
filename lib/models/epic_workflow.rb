@@ -13,6 +13,14 @@ class EpicWorkflow
     end
   end
 
+  def find_state_by_name(name)
+    epic_states.find { |s| s.name.downcase.delete(" ") == name.downcase.delete(" ") }
+  end
+
+  def find_state_like(name_pattern)
+    epic_states.find { |s| s.name.match(name_pattern) }
+  end
+
   class EpicWorkflowState
     include ActiveModel::Model
     attr_accessor :description, :entity_type, :name, :global_id, :type, :updated_at, :id, :position, :created_at

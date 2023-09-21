@@ -3,17 +3,17 @@ require "google/apis/sheets_v4"
 class PlanningSheet
   def self.check
     sheet = new
-    mismatched = sheet.initiatives.filter { |i| i.row.name != i.epic.name }
+    mismatched = sheet.initiatives.filter(&:any_mismatch?)
 
     mismatched.each do |i|
-      puts "! [#{i.row.index}] #{i.row.name} ≠ #{i.epic.name}"
+      puts "! [#{i.row.index}] #{i.sync_status.to_json}"
     end
 
     mismatched.count
   end
 
   def initiatives
-    @initiatives ||= sheet.data[0].row_data.map { |row| Initiative.new(row) }.filter(&:epic?).filter { |si| si.epic.present? }
+    @initiatives ||= sheet.data[0].row_data.map { |row| SheetInitiative.new(row) }.filter(&:epic?).filter { |si| si.epic.present? }
   end
 
   def sheets_v4
@@ -29,7 +29,7 @@ class PlanningSheet
   end
 
   def sheet_id
-    Scrb.fetch_config!("planning-sheet-ranges")
+    Scrb.fetch_config!("planning-sheet-id")
   end
 
   def ranges

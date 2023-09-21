@@ -29,8 +29,7 @@ class Epic
   attr_reader :planned_start_date, :deadline
 
   def update(attrs)
-    put_response = ScrbClient.put("/epics/#{id}", body: attrs.to_json)
-    put_response.success? ? Epic.new(put_response) : put_response
+    ScrbClient.put("/epics/#{id}", body: attrs.to_json)
   end
 
   def planned_start_date=(datetime)

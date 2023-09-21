@@ -1,5 +1,5 @@
 # An initiative represents a line-item in a planning spreadsheet and a corresponding shortcut epic.
-class Initiative
+class SheetInitiative
   attr_reader :row
 
   def initialize(raw_row)
@@ -20,6 +20,41 @@ class Initiative
 
   def epic
     @epic ||= Scrb.current_epics.find { |e| e.id == epic_id } if epic?
+  end
+
+  def any_mismatch?
+    !name_match? or !state_match? or !target_date_match?
+  end
+
+  def sync_epic!
+    attrs = {}
+    attrs[:name] = row.name if row.name
+    attrs[:epic_state_id] = sheet_status_as_workflow_state.id if sheet_status_as_workflow_state
+    attrs[:deadline] = row.target_date.to_datetime.iso8601 if row.target_date
+
+    puts attrs.to_json
+
+    response = epic.update(attrs)
+
+    binding.pry
+
+    if response.success?
+      @epic = Epic.new(response)
+    else
+      binding.pry
+    end
+  end
+
+  def sheet_status_as_workflow_state
+    EpicWorkflow.fetch.find_state_by_name(row.status)
+  end
+
+  def sync_status
+    {
+      name_match: name_match?,
+      state_match: state_match?,
+      target_date_match: target_date_match?
+    }
   end
 
   def name_match?
