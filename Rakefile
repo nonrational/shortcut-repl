@@ -107,6 +107,8 @@ namespace :planning do
     if sheet.name_mismatch_initiatives.any?
       results = PlanningSheet.sync_names_from_shortcut
       puts "Fixed #{results.length} sheet names"
+    else
+      puts "All initiative names match their corresponding epic's name."
     end
   end
 end
