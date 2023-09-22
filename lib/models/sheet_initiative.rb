@@ -23,10 +23,6 @@ class SheetInitiative
     @epic ||= Scrb.current_epics.find { |e| e.id == epic_id } if epic?
   end
 
-  def any_mismatch?
-    !name_match? or !state_match? or !target_date_match?
-  end
-
   def move_document_to_correct_drive_location
     # We tend to write documents and then share them with the right audience.
   end
@@ -37,6 +33,33 @@ class SheetInitiative
 
   def auth_client
     @auth_client ||= GoogleCredentials.load!
+  end
+
+  def copy_sheet_target_date_to_epic
+    if row.target_date&.to_date != epic.target_date&.to_date
+      result = epic.update(deadline: row.target_date&.to_date&.iso8601)
+
+      if result.success?
+        @epic = Epic.new(result)
+      else
+        binding.pry
+      end
+    end
+  end
+
+  def copy_sheet_status_to_epic
+    epic_workflow_state = EpicWorkflow.fetch.find_state_by_name(row.status)
+
+    # don't let us clear workflow state
+    if epic_workflow_state.present? && epic_workflow_state.id != epic.epic_state_id
+      result = epic.update(epic_state_id: epic_workflow_state.id)
+
+      if result.success?
+        @epic = Epic.new(result)
+      else
+        binding.pry
+      end
+    end
   end
 
   def copy_epic_name_to_sheet
@@ -57,42 +80,8 @@ class SheetInitiative
     )
   end
 
-  def synchronize
-    # prefer names from epics
-    # prefer states from sheet
-    # prefer target_dates from sheet
-    # maybe check which one was updated more recently?
-  end
-
-  def sync_epic!
-    attrs = {}
-    attrs[:name] = row.name if row.name
-    attrs[:epic_state_id] = sheet_status_as_workflow_state.id if sheet_status_as_workflow_state
-    attrs[:deadline] = row.target_date.to_datetime.iso8601 if row.target_date
-
-    puts attrs.to_json
-
-    response = epic.update(attrs)
-
-    binding.pry
-
-    if response.success?
-      @epic = Epic.new(response)
-    else
-      binding.pry
-    end
-  end
-
-  def sheet_status_as_workflow_state
-    EpicWorkflow.fetch.find_state_by_name(row.status)
-  end
-
-  def sync_status
-    {
-      name_match: name_match?,
-      state_match: state_match?,
-      target_date_match: target_date_match?
-    }
+  def any_mismatch?
+    !name_match? or !state_match? or !target_date_match?
   end
 
   def name_match?
