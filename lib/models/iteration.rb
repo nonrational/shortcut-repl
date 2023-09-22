@@ -113,9 +113,12 @@ class Iteration
     existing = self.class.find_by_name(name)
     return existing if existing.present?
 
-    result = ScrbClient.post("/iterations", body: %i[name start_date end_date].each_with_object({}) { |k, o| o[k] = send(k) }.to_json)
+    attr_keys = %i[name start_date end_date group_ids]
+
+    result = ScrbClient.post("/iterations", body: attr_keys.each_with_object({}) { |k, o| o[k] = send(k) }.to_json)
 
     binding.pry unless result.success?
+
     Iteration.new(result)
   end
 

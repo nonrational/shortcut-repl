@@ -43,7 +43,7 @@ module Scrb
     end
 
     def api_key
-      @api_key ||= config["api-key"] || ENV.fetch("SHORTCUT_API_TOKEN")
+      @api_key ||= config["shortcut-api-token"] || ENV.fetch("SHORTCUT_API_TOKEN")
     end
 
     def config
