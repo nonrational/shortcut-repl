@@ -1,15 +1,16 @@
 require "google/apis/sheets_v4"
 
 class PlanningSheet
-  def self.check
-    sheet = new
-    mismatched = sheet.initiatives.filter(&:any_mismatch?)
-
-    mismatched.each do |i|
-      puts "! [#{i.row.index}] #{i.sync_status.to_json}"
+  def sync_names_from_shortcut
+    name_mismatch_initiatives.map do |i|
+      i.copy_epic_name_to_sheet.tap do |result|
+        binding.pry unless result.success?
+      end
     end
+  end
 
-    mismatched.count
+  def name_mismatch_initiatives
+    initiatives.reject(&:name_match?)
   end
 
   def initiatives

@@ -99,9 +99,14 @@ namespace :config do
 end
 
 namespace :planning do
-  desc "Check that the names on the sheet match their epics"
-  task :name_check do
+  desc "Fix any names in the planning sheet that don't match their epic's name"
+  task :sync_names_from_shortcut do
     load_paths!
-    PlanningSheet.check
+    sheet = PlanningSheet.new
+
+    if sheet.name_mismatch_initiatives.any?
+      results = PlanningSheet.sync_names_from_shortcut
+      puts "Fixed #{results.length} sheet names"
+    end
   end
 end
