@@ -3,8 +3,8 @@ class SheetRow
   attr_accessor :row_data, :row_index, :sheet_name
 
   # TODO: Move this config?
-  # A	    B	    C	  D	        E	    F	      G       H	    I	      J	    K	  L	            M N O	P	      Q       R	  S
-  # index	Name	Doc	Shortcut	Owner	Urgency	Status	Begin	Target	Start	End	Last Mention	P	D	E	Source	Design	Eng	Notes
+  # A	    B	    C	  D	        E	    F	      G       H	    I	      J	    K	  L	           M
+  # index	Name	Doc	Shortcut	Owner	Urgency	Status	Begin	Target	Start	End	Last Mention Notes
 
   def cell_range_by_column_index(col_alpha)
     [sheet_name, "!", col_alpha.to_s.upcase, row_index].join
@@ -98,7 +98,8 @@ class SheetRow
       start_date: :J,
       target_date: :K,
       last_mention: :L,
-      notes: :S
+      story_completion: :M,
+      notes: :N
     }
   end
 end

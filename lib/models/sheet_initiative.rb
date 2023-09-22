@@ -80,6 +80,21 @@ class SheetInitiative
     )
   end
 
+  def copy_epic_story_completion_to_sheet
+    value_range = Google::Apis::SheetsV4::ValueRange.new(
+      range: row.cell_range_by_column_name(:story_completion),
+      values: [[epic.story_completion]]
+    )
+
+    sheets_v4.update_spreadsheet_value(
+      spreadsheet_id,
+      row.cell_range_by_column_name(:story_completion),
+      value_range,
+      value_input_option: "USER_ENTERED",
+      options: {authorization: auth_client}
+    )
+  end
+
   def any_mismatch?
     !name_match? or !state_match? or !target_date_match?
   end

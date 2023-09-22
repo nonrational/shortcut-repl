@@ -49,6 +49,10 @@ class Epic
     @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
   end
 
+  def story_completion
+    [stats["num_stories_done"], "/", stats["num_stories_total"]].join("")
+  end
+
   def stories
     @stories ||= begin
       ScrbClient.get("/epics/#{id}/stories").map { |s| Story.new(s) }
