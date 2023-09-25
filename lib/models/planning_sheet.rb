@@ -9,6 +9,23 @@ class PlanningSheet
     end
   end
 
+  def confirm_and_copy_each_sheet_status_to_epic
+    status_mismatch_initiatives.each do |i|
+      ap({name: i.row.name, row_status: i.row.status, epic_state: i.epic.workflow_state.name, app_url: i.epic.app_url})
+      print "Is row_status more correct than epic status? y/[n]: "
+      copy = gets
+      i.copy_sheet_status_to_epic! if /[Yy]/.match?(copy)
+    end
+
+    :ok
+  rescue => e
+    binding.pry
+  end
+
+  def status_mismatch_initiatives
+    initiatives.reject(&:status_match?)
+  end
+
   def name_mismatch_initiatives
     initiatives.reject(&:name_match?)
   end

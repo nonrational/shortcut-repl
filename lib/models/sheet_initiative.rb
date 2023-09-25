@@ -47,18 +47,14 @@ class SheetInitiative
     end
   end
 
-  def copy_sheet_status_to_epic
+  def copy_sheet_status_to_epic!
     epic_workflow_state = EpicWorkflow.fetch.find_state_by_name(row.status)
 
     # don't let us clear workflow state
     if epic_workflow_state.present? && epic_workflow_state.id != epic.epic_state_id
       result = epic.update(epic_state_id: epic_workflow_state.id)
-
-      if result.success?
-        @epic = Epic.new(result)
-      else
-        binding.pry
-      end
+      binding.pry unless result.success?
+      @epic = Epic.new(result)
     end
   end
 
@@ -96,14 +92,14 @@ class SheetInitiative
   end
 
   def any_mismatch?
-    !name_match? or !state_match? or !target_date_match?
+    !name_match? or !status_match? or !target_date_match?
   end
 
   def name_match?
     row.name.downcase == epic.name.downcase
   end
 
-  def state_match?
+  def status_match?
     row.status.delete(" ") == epic.workflow_state.name.delete(" ")
   end
 
