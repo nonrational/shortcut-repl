@@ -3,9 +3,8 @@ require "google/apis/sheets_v4"
 class PlanningSheet
   def sync_names_from_shortcut
     name_mismatch_initiatives.map do |i|
-      i.copy_epic_name_to_sheet.tap do |result|
-        binding.pry unless result.success?
-      end
+      # this doesn't have a success? method
+      i.copy_epic_name_to_sheet
     end
   end
 
