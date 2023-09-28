@@ -35,35 +35,39 @@ class SheetInitiative
     @auth_client ||= GoogleCredentials.load!
   end
 
-  def copy_sheet_target_date_to_epic
-    if row.target_date&.to_date != epic.target_date&.to_date
-      result = epic.update(deadline: row.target_date&.to_date&.iso8601)
-
-      if result.success?
-        @epic = Epic.new(result)
-      else
-        binding.pry
-      end
-    end
+  def pull
+    pull_name_from_epic
+    pull_dates_and_status_from_epic
+    pull_story_stats_from_epic
   end
 
-  def copy_sheet_status_to_epic!
+  def push
+    push_dates_and_status_to_epic
+  end
+
+  def pull_dates_and_status_from_epic
+    true
+  end
+
+  def push_dates_and_status_to_epic
     epic_workflow_state = EpicWorkflow.fetch.find_state_by_name(row.status)
 
-    # don't let us clear workflow state
+    attrs = {deadline: row.target_date&.to_date&.iso8601}
+
     if epic_workflow_state.present? && epic_workflow_state.id != epic.epic_state_id
-      result = epic.update(epic_state_id: epic_workflow_state.id)
-      binding.pry unless result.success?
-      @epic = Epic.new(result)
+      attrs[:epic_state_id] = epic_workflow_state.id
     end
+
+    result = epic.update(attrs)
+    binding.pry unless result.success?
+    @epic = Epic.new(result)
   end
 
-  def copy_epic_name_to_sheet
-    # Create the request with the hyperlinked value
+  def pull_name_from_epic
     value_range = Google::Apis::SheetsV4::ValueRange.new(
       range: row.cell_range_by_column_name(:hyperlinked_name),
       values: [
-        ["=HYPERLINK(\"#{row.name_hyperlink}\", \"#{epic.name}\")"]  # This sets the value of B2 to a hyperlink.
+        ["=HYPERLINK(\"#{epic.app_url}\", \"#{epic.name}\")"]
       ]
     )
 
@@ -76,7 +80,7 @@ class SheetInitiative
     )
   end
 
-  def copy_epic_story_completion_to_sheet
+  def pull_story_stats_from_epic
     value_range = Google::Apis::SheetsV4::ValueRange.new(
       range: row.cell_range_by_column_name(:story_completion),
       values: [[epic.story_completion]]

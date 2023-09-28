@@ -24,26 +24,33 @@ class Epic
     :productboard_plugin_id, :started_at, :completed_at, :name, :global_id, :completed, :productboard_url, :state,
     :milestone_id, :requested_by_id, :epic_state_id, :label_ids, :started_at_override, :group_id, :updated_at,
     :group_mention_ids, :productboard_id, :follower_ids, :owner_ids, :external_id, :id, :position, :productboard_name,
-    :stats, :created_at, :objective_ids
-
-  attr_reader :planned_start_date, :deadline
+    :stats, :created_at, :objective_ids, :deadline, :planned_start_date
 
   def update(attrs)
     ScrbClient.put("/epics/#{id}", body: attrs.to_json)
   end
 
-  def planned_start_date=(datetime)
-    @planned_start_date = DateTime.parse(datetime.to_s) unless datetime.nil?
+  def planned_starts_at
+    DateTime.parse(planned_start_date.to_s) unless planned_start_date.nil?
   end
 
-  def deadline=(datetime)
-    @deadline = DateTime.parse(datetime.to_s) unless datetime.nil?
+  def planned_starts_at=(at)
+    self.planned_start_date = at.iso8601 unless at.nil?
+  end
+
+  def planned_ends_at
+    DateTime.parse(target_date.to_s) unless target_date.nil?
+  end
+
+  def planned_ends_at=(at)
+    self.target_date = at.iso8601 unless at.nil?
   end
 
   alias_method :archived?, :archived
   alias_method :started?, :started
   alias_method :completed?, :completed
-  alias_method :target_date, :deadline
+
+  alias_attribute :target_date, :deadline
 
   def owner_members
     @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }

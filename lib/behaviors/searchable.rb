@@ -34,9 +34,9 @@ module Searchable
 
   def fetch_all
     while (has_more_items || page_count.zero?) && fetch_next_page.any?
-      print "."
+      print "." if ENV["DEBUG_SHOW_SEARCH_FETCH_REQUESTS"] == "1"
     end
-    puts
+    puts if ENV["DEBUG_SHOW_SEARCH_FETCH_REQUESTS"] == "1"
 
     items
   end

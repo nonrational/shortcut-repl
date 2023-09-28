@@ -98,6 +98,21 @@ namespace :config do
   end
 end
 
+
+namespace :planning_sync do
+  task :epic_names_to_sheet do
+    load_paths!
+    sheet = PlanningSheet.new
+  end
+
+  task :status_to_shortcut do
+    load_paths!
+    sheet = PlanningSheet.new
+
+
+  end
+end
+
 namespace :planning do
   desc "Fix any names in the planning sheet that don't match their epic's name"
   task :sync_names_from_shortcut do
@@ -105,10 +120,14 @@ namespace :planning do
     sheet = PlanningSheet.new
 
     if sheet.name_mismatch_initiatives.any?
-      results = PlanningSheet.sync_names_from_shortcut
+      results = sheet.sync_names_from_shortcut
       puts "Fixed #{results.length} sheet names"
     else
       puts "All initiative names match their corresponding epic's name."
     end
+  end
+
+  task :sync_dates_from_sheet do
+    
   end
 end

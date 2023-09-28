@@ -46,6 +46,14 @@ class SheetRow
     fetch(:urgency).formatted_value
   end
 
+  def start_date
+    @start_date ||= begin
+      Date.iso8601(fetch(:start_date).formatted_value)
+    rescue
+      nil
+    end
+  end
+
   def target_date
     @target_date ||= begin
       Date.iso8601(fetch(:target_date).formatted_value)

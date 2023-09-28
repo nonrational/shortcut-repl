@@ -22,11 +22,11 @@ class IterationKickoffReport
   end
 
   def story_to_csv_row(s)
-    {type: "story", app_url: s.app_url, name: s.name, owners: s.owner_members.map { |m| m&.first_name }.join(" / "), state: s.workflow_state&.name, roadmap: false, deadline: nil}
+    {type: "story", app_url: s.app_url, name: s.name, owners: s.owner_members.map { |m| m&.first_name }.join(" / "), state: s.workflow_state&.name, roadmap: false, planned_ends_at: nil}
   end
 
   def epic_to_csv_row(e)
-    {type: "epic", app_url: e.app_url, name: e.name, owners: e.owner_members.map { |m| m&.first_name }.join(" / "), state: e.workflow_state&.name, roadmap: e.roadmap?, deadline: e.deadline&.strftime("%Y-%m-%d")}
+    {type: "epic", app_url: e.app_url, name: e.name, owners: e.owner_members.map { |m| m&.first_name }.join(" / "), state: e.workflow_state&.name, roadmap: e.roadmap?, planned_ends_at: e.planned_ends_at&.strftime("%Y-%m-%d")}
   end
 
   def current_iteration_stories

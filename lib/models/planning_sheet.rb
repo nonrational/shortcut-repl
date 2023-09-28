@@ -4,7 +4,7 @@ class PlanningSheet
   def sync_names_from_shortcut
     name_mismatch_initiatives.map do |i|
       # this doesn't have a success? method
-      i.copy_epic_name_to_sheet
+      i.pull_name_from_epic
     end
   end
 
@@ -29,6 +29,10 @@ class PlanningSheet
     initiatives.reject(&:name_match?)
   end
 
+  def last_updated_at
+    binding.pry
+  end
+
   def initiatives
     @initiatives ||= begin
       sheet.data[0].row_data.drop(1).map.with_index do |row, idx|
@@ -43,16 +47,24 @@ class PlanningSheet
     end
   end
 
+  def drive_v3
+    @drive_v3 ||= Google::Apis::DriveV3::DriveService.new.tap { |s| s.authorization = auth_client }
+  end
+
   def sheets_v4
-    @sheets_v4 ||= Google::Apis::SheetsV4::SheetsService.new
+    @sheets_v4 ||= Google::Apis::SheetsV4::SheetsService.new.tap { |s| s.authorization = auth_client }
   end
 
   def sheet
     @sheet ||= spreadsheet.sheets.first
   end
 
+  def last_modified_at
+    drive_v3.get_file(spreadsheet_id, fields: "modifiedTime").modified_time
+  end
+
   def spreadsheet
-    @spreadsheet ||= sheets_v4.get_spreadsheet(spreadsheet_id, include_grid_data: true, ranges: [spreadsheet_range], options: {authorization: auth_client})
+    @spreadsheet ||= sheets_v4.get_spreadsheet(spreadsheet_id, include_grid_data: true, ranges: [spreadsheet_range])
   end
 
   def spreadsheet_id

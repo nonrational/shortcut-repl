@@ -34,14 +34,14 @@ class IterationReadySort
   def sort_order_for(story)
     [
       story.priority_position + story_type_modifier(story) + story_blocked_modifier(story),
-      story_deadline_rank(story),
+      story_has_target_date_rank(story),
       epic_product_area_position(story),
       story.id
     ]
   end
 
-  def story_deadline_rank(story)
-    story.deadline.present? ? -1 : 1
+  def story_has_target_date_rank(story)
+    story.target_date.present? ? -1 : 1
   end
 
   def story_blocked_modifier(story)
@@ -63,7 +63,6 @@ class IterationReadySort
   end
 
   def epic_product_area_position(story)
-    # TODO: consider deadlines in sorting
     # TODO: consider a story's position within its epic
     in_progress_epics.find_index { |e| e.id == story.epic_id } || story.product_area_priority
   end

@@ -16,6 +16,8 @@ class Story
   alias_method :completed?, :completed
   [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
 
+  alias_attribute :target_date, :deadline
+
   class << self
     def find(id)
       ScrbClient.get("/stories/#{id}")
