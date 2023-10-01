@@ -50,7 +50,8 @@ class Epic
   alias_method :started?, :started
   alias_method :completed?, :completed
 
-  alias_attribute :target_date, :deadline
+  alias_method :target_date, :deadline
+  alias_method :target_date=, :deadline=
 
   def owner_members
     @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
@@ -58,6 +59,11 @@ class Epic
 
   def story_completion
     [stats["num_stories_done"], "/", stats["num_stories_total"]].join("")
+  end
+
+  def percent_complete
+    return "0%" unless stats["num_stories_total"] > 0
+    ((stats["num_stories_done"].to_f / stats["num_stories_total"].to_f) * 100).round.to_s + "%"
   end
 
   def stories

@@ -24,7 +24,6 @@ class SheetInitiative
   # | '_ \ || (_-< ' \  |  _/ _ \ / -_) '_ \ / _|
   # | .__/\_,_/__/_||_|  \__\___/ \___| .__/_\__|
   # |_|                               |_|
-
   def push_dates_and_status_to_epic
     epic_workflow_state = EpicWorkflow.fetch.find_state_by_name(row.status)
 
@@ -45,12 +44,27 @@ class SheetInitiative
   # | .__/\_,_|_|_| |_| |_| \___/_|_|_| \___| .__/_\__|
   # |_|                                     |_|
 
+  def pull_dates_and_status_from_epic
+    # TODO
+  end
+
   def pull_target_dates_from_epic
     # TODO
   end
 
   def pull_status_from_epic
-    # TODO
+    value_range = Google::Apis::SheetsV4::ValueRange.new(
+      range: row.cell_range_by_column_name(:status),
+      values: [[epic.workflow_state.name]]
+    )
+
+    sheets_v4.update_spreadsheet_value(
+      spreadsheet_id,
+      row.cell_range_by_column_name(:status),
+      value_range,
+      value_input_option: "USER_ENTERED",
+      options: {authorization: auth_client}
+    )
   end
 
   def pull_name_from_epic
@@ -73,7 +87,7 @@ class SheetInitiative
   def pull_story_stats_from_epic
     value_range = Google::Apis::SheetsV4::ValueRange.new(
       range: row.cell_range_by_column_name(:story_completion),
-      values: [[epic.story_completion]]
+      values: [[epic.percent_complete]]
     )
 
     sheets_v4.update_spreadsheet_value(

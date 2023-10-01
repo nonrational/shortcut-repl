@@ -1,22 +1,50 @@
 require "google/apis/sheets_v4"
 
 class PlanningSheet
-  def sync_names_from_shortcut
+  def push_sheet_order_to_shortcut!
+    initiatives.each_cons(2) do |pre, post|
+      puts "#{pre.epic.name}(#{pre.row_index}) is before #{post.epic.name}(#{post.row_index})"
+
+      post.epic.update(after_id: pre.epic.id).tap do |res|
+        binding.pry unless res.success?
+      end
+    end
+
+    :ok
+  end
+
+  def sync_names_from_shortcut!
     name_mismatch_initiatives.map do |i|
       # this doesn't have a success? method
       i.pull_name_from_epic
     end
+
+    :ok
   end
 
-  def confirm_and_copy_each_sheet_status_to_epic
-    status_mismatch_initiatives.each do |i|
-      ap({name: i.row.name, row_status: i.row.status, epic_state: i.epic.workflow_state.name, app_url: i.epic.app_url})
-      print "Is row_status more correct than epic status? y/[n]: "
-      copy = gets
-      i.copy_sheet_status_to_epic! if /[Yy]/.match?(copy)
+  def confirm_and_copy_each_sheet_status_to_epic!
+    initiatives.each do |i|
+      ap({
+        name: i.row.name,
+        row_status: i.row.status,
+        epic_state: i.epic.workflow_state.name,
+        row_target: i.row.target_date,
+        epic_target: i.epic.planned_ends_at&.to_date
+      })
+
+      print "Push workflow state and target date to Shortcut? y/[n]: "
+
+      copy = $stdin.gets
+      i.push_dates_and_status_to_epic if /[Yy]/.match?(copy)
     end
 
     :ok
+  rescue => e
+    binding.pry
+  end
+
+  def pull_all_story_stats_from_epics
+    initiatives.each { |i| i.pull_story_stats_from_epic }
   rescue => e
     binding.pry
   end
@@ -27,10 +55,6 @@ class PlanningSheet
 
   def name_mismatch_initiatives
     initiatives.reject(&:name_match?)
-  end
-
-  def last_updated_at
-    binding.pry
   end
 
   def initiatives
