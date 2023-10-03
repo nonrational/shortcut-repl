@@ -105,4 +105,8 @@ namespace :planning do
   task :pull_epic_names_to_sheet do
     PlanningSheet.new.sync_names_from_shortcut!
   end
+
+  task :pull_story_stats_to_sheet do
+    PlanningSheet.new.pull_all_story_stats_from_epics!
+  end
 end

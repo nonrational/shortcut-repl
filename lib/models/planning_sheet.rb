@@ -43,7 +43,7 @@ class PlanningSheet
     binding.pry
   end
 
-  def pull_all_story_stats_from_epics
+  def pull_all_story_stats_from_epics!
     initiatives.each { |i| i.pull_story_stats_from_epic }
   rescue => e
     binding.pry
