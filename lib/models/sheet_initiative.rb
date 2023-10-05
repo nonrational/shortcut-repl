@@ -53,50 +53,23 @@ class SheetInitiative
   end
 
   def pull_status_from_epic
-    value_range = Google::Apis::SheetsV4::ValueRange.new(
-      range: row.cell_range_by_column_name(:status),
-      values: [[epic.workflow_state.name]]
-    )
-
-    sheets_v4.update_spreadsheet_value(
-      spreadsheet_id,
-      row.cell_range_by_column_name(:status),
-      value_range,
-      value_input_option: "USER_ENTERED",
-      options: {authorization: auth_client}
-    )
+    # TODO: Spacing here might matter. Not sure if this is safe.
+    row.update_cell_value(:status, epic.workflow_state.name)
   end
 
   def pull_name_from_epic
-    value_range = Google::Apis::SheetsV4::ValueRange.new(
-      range: row.cell_range_by_column_name(:hyperlinked_name),
-      values: [
-        ["=HYPERLINK(\"#{epic.app_url}\", \"#{epic.name}\")"]
-      ]
-    )
+    raw_app_url = epic.app_url
+    # append `?group_by=workflow_state_id` to all hyperlinked epics
+    uri = URI.parse(raw_app_url)
+    query_params = URI.decode_www_form(uri.query || "")
+    query_params << ["group_by", "workflow_state_id"]
+    uri.query = URI.encode_www_form(query_params)
 
-    sheets_v4.update_spreadsheet_value(
-      spreadsheet_id,
-      row.cell_range_by_column_name(:hyperlinked_name),
-      value_range,
-      value_input_option: "USER_ENTERED",
-      options: {authorization: auth_client}
-    )
+    row.update_cell_value(:hyperlinked_name, "=HYPERLINK(\"#{uri}\", \"#{epic.name}\")")
   end
 
   def pull_story_stats_from_epic
-    value_range = Google::Apis::SheetsV4::ValueRange.new(
-      range: row.cell_range_by_column_name(:story_completion),
-      values: [[epic.percent_complete]]
-    )
-
-    sheets_v4.update_spreadsheet_value(
-      spreadsheet_id,
-      row.cell_range_by_column_name(:story_completion),
-      value_range,
-      value_input_option: "USER_ENTERED",
-      options: {authorization: auth_client}
-    )
+    row.update_cell_value(:story_completion, epic.percent_complete)
   end
 
   #       _ _   _   _                     _
@@ -106,7 +79,12 @@ class SheetInitiative
   #
 
   def row
-    @row ||= SheetRow.new(row_data: row_data, row_index: row_index, sheet_name: sheet_name)
+    @row ||= SheetRow.new(
+      spreadsheet_id: spreadsheet_id,
+      row_data: row_data,
+      row_index: row_index,
+      sheet_name: sheet_name
+    )
   end
 
   def story?

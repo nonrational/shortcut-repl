@@ -14,9 +14,10 @@ class PlanningSheet
   end
 
   def sync_names_from_shortcut!
-    name_mismatch_initiatives.map do |i|
+    initiatives.map do |i|
       # this doesn't have a success? method
-      i.pull_name_from_epic
+      result = i.pull_name_from_epic
+      binding.pry unless result.updated_cells == 1
     end
 
     :ok

@@ -1,10 +1,33 @@
 class SheetRow
   include ActiveModel::Model
-  attr_accessor :row_data, :row_index, :sheet_name
+  attr_accessor :spreadsheet_id, :row_data, :row_index, :sheet_name
 
   # TODO: Move this config?
   # A	    B	    C	  D	        E	    F	      G       H	    I	      J	    K	  L	           M
   # index	Name	Doc	Shortcut	Owner	Urgency	Status	Begin	Target	Start	End	Last Mention Notes
+
+  def update_cell_value(name, user_entered_value)
+    value_range = Google::Apis::SheetsV4::ValueRange.new(
+      range: cell_range_by_column_name(name),
+      values: [[user_entered_value]]
+    )
+
+    sheets_v4.update_spreadsheet_value(
+      spreadsheet_id,
+      cell_range_by_column_name(name),
+      value_range,
+      value_input_option: "USER_ENTERED",
+      options: {authorization: auth_client}
+    )
+  end
+
+  def sheets_v4
+    @sheets_v4 ||= Google::Apis::SheetsV4::SheetsService.new
+  end
+
+  def auth_client
+    @auth_client ||= GoogleCredentials.load!
+  end
 
   def cell_range_by_column_index(col_alpha)
     [sheet_name, "!", col_alpha.to_s.upcase, row_index].join
