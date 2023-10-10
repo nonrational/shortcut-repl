@@ -9,16 +9,18 @@ class GoogleCredentials < Signet::OAuth2::Client
     end
 
     def load!
-      raise unless exist?
+      raise "missing #{json_path}" unless exist?
 
-      new(JSON.parse(File.read(json_path))).tap do |creds|
-        if creds.expired?
-          creds.refresh!
-          creds.store!
-        end
+      creds = new(JSON.parse(File.read(json_path)))
 
-        puts "Token valid for #{creds.minutes_remaining} minutes"
+      if creds.expired?
+        creds.refresh!
+        creds.store!
+        # G.O.A.T. – Google OAuth Access Token
+        puts "✨🐐✨ valid until #{creds.expires_at.iso8601}"
       end
+
+      creds
     end
   end
 
