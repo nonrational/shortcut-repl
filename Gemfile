@@ -14,4 +14,5 @@ gem "sinatra"
 gem "table_print"
 
 gem "dotenv", groups: [:development]
+gem "rerun", groups: [:development]
 gem "standard", group: [:development, :test]
