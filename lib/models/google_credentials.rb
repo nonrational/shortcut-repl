@@ -15,12 +15,15 @@ class GoogleCredentials < Signet::OAuth2::Client
 
       if creds.expired?
         creds.refresh!
-        creds.store!
         # G.O.A.T. – Google OAuth Access Token
         puts "✨🐐✨ valid until #{creds.expires_at.iso8601}"
-      end
+        creds.store!
 
-      creds
+        # try to fix that annoying bug with expired creds...
+        new(JSON.parse(File.read(json_path)))
+      else
+        creds
+      end
     end
   end
 

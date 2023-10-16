@@ -23,7 +23,7 @@ class PlanningSheet
     :ok
   end
 
-  def confirm_and_copy_each_sheet_status_to_epic!
+  def synchronize_status!
     initiatives.each do |i|
       ap({
         name: i.row.name,

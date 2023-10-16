@@ -48,9 +48,11 @@ namespace :iteration do
   namespace :ready_sort do
     desc "Sort all the stories in the ready column in the current iteration by epic and priority"
     task :run do
+      puts "Sorting epics by planning sheet order..."
       # ensure that the priority order reflected in the planning sheet is respected
       PlanningSheet.new.push_sheet_order_to_shortcut!
       # then sort all the "ready" cards in the current iteration
+      puts "Sorting ready stories by priority..."
       IterationReadySort.new.run
     end
 
@@ -96,10 +98,6 @@ end
 namespace :planning do
   task :push_sheet_order_to_shortcut do
     PlanningSheet.new.push_sheet_order_to_shortcut!
-  end
-
-  task :push_sheet_status_to_epics do
-    PlanningSheet.new.confirm_and_copy_each_sheet_status_to_epic!
   end
 
   task :pull_epic_names_to_sheet do
