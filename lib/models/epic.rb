@@ -57,6 +57,10 @@ class Epic
     @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
   end
 
+  def participant_members
+    @participant_members ||= stories.flat_map(&:owner_members).uniq(&:id)
+  end
+
   def story_completion
     [stats["num_stories_done"], "/", stats["num_stories_total"]].join("")
   end

@@ -72,6 +72,10 @@ class SheetInitiative
     row.update_cell_value(:story_completion, epic.percent_complete)
   end
 
+  def pull_participants_from_epic
+    row.update_cell_value(:participants, epic.participant_members.map(&:first_name).join(", "))
+  end
+
   #       _ _   _   _                     _
   #  __ _| | | | |_| |_  ___   _ _ ___ __| |_
   # / _` | | | |  _| ' \/ -_) | '_/ -_|_-<  _|

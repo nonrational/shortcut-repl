@@ -130,7 +130,8 @@ class SheetRow
       target_date: :K,
       last_mention: :L,
       story_completion: :M,
-      notes: :N
+      notes: :N,
+      participants: :O
     }
   end
 end
