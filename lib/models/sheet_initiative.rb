@@ -15,6 +15,7 @@ class SheetInitiative
   end
 
   def move_document_to_correct_drive_location
+    raise "Not Yet Implemented"
     # TODO: We tend to write documents and then share them with the right audience.
     #       This method should eventually move an individual PAD/RFC to the correct folder.
   end
