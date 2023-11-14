@@ -50,11 +50,15 @@ class SheetRow
   end
 
   def doctype
-    etch(:hyperlinked_doctype).formatted_value
+    fetch(:hyperlinked_doctype).formatted_value
   end
 
   def doctype_hyperlink
     fetch(:hyperlinked_doctype).hyperlink
+  end
+
+  def document_id
+    doctype_hyperlink.reverse.split("/")[1].reverse
   end
 
   def shortcut_id

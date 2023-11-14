@@ -1,6 +1,15 @@
 require "google/apis/sheets_v4"
 
 class PlanningSheet
+  def organize_documents!
+    results = initiatives.map do |i|
+      puts "[#{i.row_index}] #{i.row.name}"
+      i.move_document_to_correct_drive_location
+    end
+
+    binding.pry
+  end
+
   def push_sheet_order_to_shortcut!
     initiatives.each_cons(2) do |pre, post|
       puts "#{pre.epic.name}(#{pre.row_index}) is before #{post.epic.name}(#{post.row_index})"
@@ -58,6 +67,7 @@ class PlanningSheet
     initiatives.reject(&:name_match?)
   end
 
+  # note that this will obey the filter on the sheet
   def initiatives
     @initiatives ||= begin
       sheet.data[0].row_data.drop(1).map.with_index do |row, idx|

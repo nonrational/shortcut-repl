@@ -3,6 +3,9 @@ class SheetInitiative
   include ActiveModel::Model
   attr_accessor :row_data, :row_index, :spreadsheet_id, :spreadsheet_range, :sheet_name
 
+  # delegate the name function to row
+  delegate :name, to: :row
+
   def pull
     pull_name_from_epic
     pull_target_dates_from_epic
@@ -15,9 +18,32 @@ class SheetInitiative
   end
 
   def move_document_to_correct_drive_location
-    raise "Not Yet Implemented"
-    # TODO: We tend to write documents and then share them with the right audience.
-    #       This method should eventually move an individual PAD/RFC to the correct folder.
+    return false unless row.doctype_hyperlink.present?
+
+    # get the document id from the row and move it to the correct folder based on its type.
+    doctype_key = row.doctype&.downcase
+    target_folder_id = Scrb.fetch_config!("planning-document-folders-by-doctype")[doctype_key]
+
+    # break and return early if we don't have a target folder id
+    if target_folder_id.nil?
+      binding.pry
+      return false
+    end
+
+    file = drive_v3.get_file(row.document_id, fields: "parents", supports_all_drives: true)
+    previous_parents = file.parents.join(",")
+
+    return :ok if previous_parents == target_folder_id
+
+    puts "Moving #{row.document_id} from #{previous_parents} to #{target_folder_id}..."
+
+    drive_v3.update_file(
+      row.document_id,
+      add_parents: target_folder_id,
+      remove_parents: previous_parents,
+      fields: "id,parents",
+      supports_all_drives: true
+    )
   end
 
   #               _      _                  _
@@ -96,6 +122,7 @@ class SheetInitiative
     /story-/.match?(row.shortcut_id)
   end
 
+  # does the sheet row have an epic listed?
   def epic?
     /epic-/.match?(row.shortcut_id)
   end
@@ -104,12 +131,13 @@ class SheetInitiative
     @epic_id ||= row.shortcut_id.split("-")[1].to_i if epic?
   end
 
+  # does the sheet row list a valid shortcut epic?
   def epic
     @epic ||= Scrb.current_epics.find { |e| e.id == epic_id } if epic?
   end
 
-  def sheets_v4
-    @sheets_v4 ||= Google::Apis::SheetsV4::SheetsService.new
+  def drive_v3
+    @drive_v3 ||= Google::Apis::DriveV3::DriveService.new.tap { |s| s.authorization = auth_client }
   end
 
   def auth_client
