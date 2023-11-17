@@ -132,10 +132,10 @@ class SheetRow
       target_iteration: :I,
       start_date: :J,
       target_date: :K,
-      last_mention: :L,
-      story_completion: :M,
-      notes: :N,
-      participants: :O
+      participants: :L,
+      last_mention: :M,
+      story_completion: :N,
+      notes: :O
     }
   end
 end

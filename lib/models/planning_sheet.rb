@@ -11,10 +11,10 @@ class PlanningSheet
   end
 
   def push_sheet_order_to_shortcut!
-    initiatives.each_cons(2) do |pre, post|
-      puts "#{pre.epic.name}(#{pre.row_index}) is before #{post.epic.name}(#{post.row_index})"
+    initiatives.each_cons(2) do |before, after|
+      puts "#{before.epic.name}(#{before.row_index}) is before #{after.epic.name}(#{after.row_index})"
 
-      post.epic.update(after_id: pre.epic.id).tap do |res|
+      after.epic.update(after_id: before.epic.id).tap do |res|
         binding.pry unless res.success?
       end
     end
