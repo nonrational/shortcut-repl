@@ -69,7 +69,11 @@ class PlanningSheet
 
   # note that this will obey the filter on the sheet
   def initiatives
-    @initiatives ||= begin
+    @initiatives ||= raw_initiatives.filter { |si| si.epic.present? }
+  end
+
+  def raw_initiatives
+    @raw_initiatives ||= begin
       sheet.data[0].row_data.drop(1).map.with_index do |row, idx|
         SheetInitiative.new(
           row_data: row,
@@ -78,7 +82,7 @@ class PlanningSheet
           spreadsheet_range: spreadsheet_range,
           sheet_name: spreadsheet_range.split("!").first
         )
-      end.filter(&:epic?).filter { |si| si.epic.present? }
+      end
     end
   end
 
@@ -91,7 +95,9 @@ class PlanningSheet
   end
 
   def sheet
-    @sheet ||= spreadsheet.sheets.first
+    @sheet ||= begin
+      spreadsheet.sheets.first
+    end
   end
 
   def last_modified_at

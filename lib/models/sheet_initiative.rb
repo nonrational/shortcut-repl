@@ -4,7 +4,7 @@ class SheetInitiative
   attr_accessor :row_data, :row_index, :spreadsheet_id, :spreadsheet_range, :sheet_name
 
   # delegate the name function to row
-  delegate :name, to: :row
+  delegate :epic_id, :name, to: :row
 
   def pull
     pull_name_from_epic
@@ -26,7 +26,7 @@ class SheetInitiative
 
     # break and return early if we don't have a target folder id
     if target_folder_id.nil?
-      binding.pry
+      # binding.pry
       return false
     end
 
@@ -96,7 +96,13 @@ class SheetInitiative
   end
 
   def pull_story_stats_from_epic
-    row.update_cell_value(:story_completion, epic.percent_complete)
+    total = epic.stats["num_stories_total"]
+    in_progress = epic.stats["num_stories_started"]
+    done = epic.stats["num_stories_done"]
+
+    stats_summary = "#{total} / #{in_progress} / #{done} (#{epic.percent_complete})"
+
+    row.update_cell_value(:story_completion, stats_summary)
   end
 
   def pull_participants_from_epic
@@ -118,22 +124,9 @@ class SheetInitiative
     )
   end
 
-  def story?
-    /story-/.match?(row.shortcut_id)
-  end
-
-  # does the sheet row have an epic listed?
-  def epic?
-    /epic-/.match?(row.shortcut_id)
-  end
-
-  def epic_id
-    @epic_id ||= row.shortcut_id.split("-")[1].to_i if epic?
-  end
-
   # does the sheet row list a valid shortcut epic?
   def epic
-    @epic ||= Scrb.current_epics.find { |e| e.id == epic_id } if epic?
+    @epic ||= Scrb.current_epics.find { |e| e.id == epic_id } if epic_id.present?
   end
 
   def drive_v3
@@ -158,17 +151,5 @@ class SheetInitiative
 
   def target_date_match?
     row.target_date == epic.target_date&.to_date
-  end
-
-  def to_s
-    if epic.present?
-      ["epic", epic.number, epic.name, row.target_date, epic.target_date&.to_date&.iso8601].join(",")
-    elsif epic?
-      ["epic", row.shortcut_id, "ERR!", nil, nil].join(",")
-    elsif story?
-      ["story", "ERR!", "ERR!", nil, nil].join(",")
-    else
-      ["ERR!", "ERR!", "ERR!", nil, nil].join(",")
-    end
   end
 end
