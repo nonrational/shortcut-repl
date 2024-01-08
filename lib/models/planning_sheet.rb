@@ -32,6 +32,26 @@ class PlanningSheet
     :ok
   end
 
+  def sync_story_stats_from_shortcut!
+    initiatives.map do |i|
+      # this doesn't have a success? method
+      result = i.pull_story_stats_from_epic
+      binding.pry unless result.updated_cells == 1
+    end
+
+    :ok
+  end
+
+  def sync_participants_from_shortcut!
+    initiatives.map do |i|
+      # this doesn't have a success? method
+      result = i.pull_participants_from_epic
+      binding.pry unless result.updated_cells == 1
+    end
+
+    :ok
+  end
+
   def synchronize_status!
     initiatives.each do |i|
       ap({
