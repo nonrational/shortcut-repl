@@ -94,6 +94,15 @@ class Iteration
 
   # instance methods #########################################
 
+  def self.print_all_for_year(year)
+    curr = Iteration.find_current
+
+    while curr.year == year
+      puts curr
+      curr = curr.build_next
+    end
+  end
+
   def exists?
     self.class.where(name: name).any?
   end

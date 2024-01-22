@@ -1,8 +1,25 @@
+# This is an all-encompassing mega-class that runs all the things you need to
+# do to keep Shortcut and Google Sheets in sync.
+#
+# It's meant to be run interactively, so you can make decisions about which
+# data is more correct, and then copy it over to the other system.
+#
+# It's also meant to be run in a Rails console, so you can see the results of
+# each step as it runs.
+#
+# To run it, do this:
+#
+#   $ rails c
+#   > KitchenSink.run_interactive
+#
+# It will prompt you for each decision, and then run the syncs.
+
 class KitchenSink
   def self.run_interactive
     puts "Sorting epics by planning sheet order..."
     PlanningSheet.new.push_sheet_order_to_shortcut!
     PlanningSheet.new.sync_names_from_shortcut!
+
     puts "Sorting ready stories by priority..."
     IterationReadySort.new.run
 
