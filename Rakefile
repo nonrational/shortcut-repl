@@ -39,7 +39,7 @@ namespace :iteration do
 
   desc "Create the next iteration"
   task :create_next do
-    curr = Iteration.find_futuremost
+    curr = Iteration.find_futuremost || Iteration.find_current
     next_iteration = curr.build_next
     puts "Creating #{next_iteration.name} from #{next_iteration.start_date} to #{next_iteration.end_date}"
     curr.build_next.save
