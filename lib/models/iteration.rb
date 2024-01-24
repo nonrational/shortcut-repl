@@ -20,7 +20,7 @@ class Iteration
       days_left = (candidate.end_of_month - candidate).to_i
 
       if (3..10).cover?(days_left)
-        warn "WARNING: #{candidate} is only #{days_left} days from the end of the month. Moving to the following Saturday."
+        # warn "WARNING: #{candidate} is only #{days_left} days from the end of the month. Moving to the following Saturday."
         candidate = (candidate + 1.day).next_occurring(:saturday).to_date
       end
 

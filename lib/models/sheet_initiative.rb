@@ -126,7 +126,7 @@ class SheetInitiative
 
   # does the sheet row list a valid shortcut epic?
   def epic
-    @epic ||= Scrb.current_epics.find { |e| e.id == epic_id } if epic_id.present?
+    @epic ||= Scrb.recent_epics.find { |e| e.id == epic_id } if epic_id.present?
   end
 
   def drive_v3
