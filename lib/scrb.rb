@@ -10,6 +10,19 @@ module Scrb
       ShortcutRuby::Shortcut.new(api_key)
     end
 
+    def recent_epics
+      recently_updated_epics + current_epics
+    end
+
+    def recently_updated_epics
+      @recently_updated_epics ||= begin
+        today = Date.today.iso8601
+        last_month = Date.today.last_month.iso8601
+
+        Epic.search("!is:archived updated:#{last_month}..#{today}")
+      end
+    end
+
     def current_epics
       @current_epics ||= Epic.search("!is:archived !is:done")
     end
