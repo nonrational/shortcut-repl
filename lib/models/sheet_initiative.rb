@@ -92,7 +92,10 @@ class SheetInitiative
     query_params << ["group_by", "workflow_state_id"]
     uri.query = URI.encode_www_form(query_params)
 
-    row.update_cell_value(:hyperlinked_name, "=HYPERLINK(\"#{uri}\", \"#{epic.name}\")")
+    # translate double quotes to single quotes to avoid breaking the google sheet formula
+    safe_epic_name = epic.name.tr('"', "'")
+
+    row.update_cell_value(:hyperlinked_name, "=HYPERLINK(\"#{uri}\", \"#{safe_epic_name}\")")
   end
 
   def pull_story_stats_from_epic
@@ -114,6 +117,10 @@ class SheetInitiative
   # / _` | | | |  _| ' \/ -_) | '_/ -_|_-<  _|
   # \__,_|_|_|  \__|_||_\___| |_| \___/__/\__|
   #
+
+  def to_s
+    puts "[#{row_index}] #{row.name}"
+  end
 
   def row
     @row ||= SheetRow.new(

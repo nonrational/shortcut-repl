@@ -1,13 +1,28 @@
 require "google/apis/sheets_v4"
 
 class PlanningSheet
+  def download!
+    initiatives.map do |i|
+      puts i
+
+      res_name = i.pull_name_from_epic
+      res_stats = i.pull_story_stats_from_epic
+      res_parts = i.pull_participants_from_epic
+
+      (res_name.updated_cells + res_stats.updated_cells + res_parts.updated_cells).tap do |s|
+        binding.pry unless s == 3
+      end
+    end
+  end
+
+  def upload
+  end
+
   def organize_documents!
-    results = initiatives.map do |i|
-      puts "[#{i.row_index}] #{i.row.name}"
+    initiatives.map do |i|
+      puts i
       i.move_document_to_correct_drive_location
     end
-
-    binding.pry
   end
 
   def push_sheet_order_to_shortcut!
@@ -17,36 +32,6 @@ class PlanningSheet
       after.epic.update(after_id: before.epic.id).tap do |res|
         binding.pry unless res.success?
       end
-    end
-
-    :ok
-  end
-
-  def sync_names_from_shortcut!
-    initiatives.map do |i|
-      # this doesn't have a success? method
-      result = i.pull_name_from_epic
-      binding.pry unless result.updated_cells == 1
-    end
-
-    :ok
-  end
-
-  def sync_story_stats_from_shortcut!
-    initiatives.map do |i|
-      # this doesn't have a success? method
-      result = i.pull_story_stats_from_epic
-      binding.pry unless result.updated_cells == 1
-    end
-
-    :ok
-  end
-
-  def sync_participants_from_shortcut!
-    initiatives.map do |i|
-      # this doesn't have a success? method
-      result = i.pull_participants_from_epic
-      binding.pry unless result.updated_cells == 1
     end
 
     :ok
@@ -69,12 +54,6 @@ class PlanningSheet
     end
 
     :ok
-  rescue => e
-    binding.pry
-  end
-
-  def pull_all_story_stats_from_epics!
-    initiatives.each { |i| i.pull_story_stats_from_epic }
   rescue => e
     binding.pry
   end

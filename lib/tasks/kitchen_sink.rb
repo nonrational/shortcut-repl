@@ -17,8 +17,8 @@
 class KitchenSink
   def self.run_interactive
     puts "Sorting epics by planning sheet order..."
+    # Make the shortcut epic order match the planning sheet order
     PlanningSheet.new.push_sheet_order_to_shortcut!
-    PlanningSheet.new.sync_names_from_shortcut!
 
     puts "Sorting ready stories by priority..."
     IterationReadySort.new.run
