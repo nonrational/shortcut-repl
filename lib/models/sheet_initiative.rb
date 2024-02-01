@@ -53,15 +53,27 @@ class SheetInitiative
   # |_|                               |_|
   def push_dates_and_status_to_epic
     epic_workflow_state = EpicWorkflow.fetch.find_state_by_name(row.status)
+    product_group_id = Group.find_by_name("Product").id
 
-    attrs = {deadline: row.target_date&.to_date&.iso8601}
+    attrs = {
+      # TODO: add quarterly labels
+      planned_start_date: row.start_date&.to_date&.iso8601,
+      deadline: row.target_date&.to_date&.iso8601
+    }
 
     if epic_workflow_state.present? && epic_workflow_state.id != epic.epic_state_id
       attrs[:epic_state_id] = epic_workflow_state.id
     end
 
+    if epic.group_id != product_group_id
+      attrs[:group_id] = product_group_id
+    end
+
+    ap(attrs)
+    binding.pry
     result = epic.update(attrs)
-    binding.pry unless result.success?
+    binding.pry
+
     @epic = Epic.new(result)
   end
 

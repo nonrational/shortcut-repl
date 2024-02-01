@@ -30,6 +30,18 @@ class Epic
     ScrbClient.put("/epics/#{id}", body: attrs.to_json)
   end
 
+  def assign_to_group(group_name)
+    group_id = Group.find_by_name(group_name).id
+
+    return "Group not found" if group_id.nil?
+    return "Group already assigned" if self.group_id == group_id
+
+    result = update(group_id: group_id)
+    binding.pry
+
+    :ok
+  end
+
   def planned_starts_at
     DateTime.parse(planned_start_date.to_s) unless planned_start_date.nil?
   end

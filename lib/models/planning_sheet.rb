@@ -15,7 +15,31 @@ class PlanningSheet
     end
   end
 
-  def upload
+  def upload_interactive
+    initiatives.each do |i|
+      ap({
+        # TODO: Should we use the epic name instead?
+        epic_url: i.epic.app_url,
+        name: i.row.name,
+        row_status: i.row.status,
+        epic_state: i.epic.workflow_state.name,
+        row_target: i.row.target_date,
+        epic_target: i.epic.planned_ends_at&.to_date
+      })
+
+      print "Which is more correct? row/epic/[skip]: "
+      winner = $stdin.gets
+
+      if /ro?w?/i.match?(winner)
+        # push row to epic
+        i.push_dates_and_status_to_epic
+      elsif /ep?i?c?/i.match?(winner)
+        # pull epic to row
+        puts "not implemented yet"
+      end
+    end
+  rescue => e
+    binding.pry
   end
 
   def organize_documents!
@@ -35,27 +59,6 @@ class PlanningSheet
     end
 
     :ok
-  end
-
-  def synchronize_status!
-    initiatives.each do |i|
-      ap({
-        name: i.row.name,
-        row_status: i.row.status,
-        epic_state: i.epic.workflow_state.name,
-        row_target: i.row.target_date,
-        epic_target: i.epic.planned_ends_at&.to_date
-      })
-
-      print "Push workflow state and target date to Shortcut? y/[n]: "
-
-      copy = $stdin.gets
-      i.push_dates_and_status_to_epic if /[Yy]/.match?(copy)
-    end
-
-    :ok
-  rescue => e
-    binding.pry
   end
 
   def status_mismatch_initiatives

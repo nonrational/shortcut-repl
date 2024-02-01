@@ -18,6 +18,17 @@ end
 
 load_paths!
 
+namespace :sheet do
+  desc "Fetch information from shortcut and update the sheet with it"
+  task :pull do
+    PlanningSheet.new.download!
+  end
+
+  task :"push-interactive" do
+    PlanningSheet.new.upload_interactive
+  end
+end
+
 namespace :iteration do
   desc "Preview the next handful iteration start/end dates"
   task :preview do
@@ -92,19 +103,5 @@ namespace :config do
 
     raise "missing keys: #{(expected_keys - actual_keys).to_a.join(",")}" unless actual_keys.superset?(expected_keys)
     puts "Looks good!"
-  end
-end
-
-namespace :planning do
-  task :push_sheet_order_to_shortcut do
-    PlanningSheet.new.push_sheet_order_to_shortcut!
-  end
-
-  task :pull_epic_names_to_sheet do
-    PlanningSheet.new.sync_names_from_shortcut!
-  end
-
-  task :pull_story_stats_to_sheet do
-    PlanningSheet.new.pull_all_story_stats_from_epics!
   end
 end
