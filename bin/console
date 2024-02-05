@@ -29,6 +29,7 @@ def lib_files
   path = File.expand_path("../..", __FILE__)
 
   [
+    'lib/core_extensions',
     'lib/behaviors',
     'lib/models',
     'lib/models/custom_fields',

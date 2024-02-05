@@ -14,7 +14,7 @@ class EpicWorkflow
   end
 
   def find_state_by_name(name)
-    epic_states.find { |s| s.name.downcase.delete(" ") == name.downcase.delete(" ") }
+    epic_states.find { |s| s.name.downcase.gsub(/[^a-z]/i, "") == name.downcase.gsub(/[^a-z]/i, "") }
   end
 
   def find_state_like(name_pattern)

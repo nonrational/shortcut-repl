@@ -23,10 +23,6 @@ class KitchenSink
     puts "Sorting ready stories by priority..."
     IterationReadySort.new.run
 
-    PlanningSheet.new.sync_names_from_shortcut!
-    PlanningSheet.new.sync_story_stats_from_shortcut!
-    PlanningSheet.new.sync_participants_from_shortcut!
-
     puts "Checking Sheet rows against Shortcut epics..."
     PlanningSheet.new.initiatives.each do |i|
       ap({
