@@ -15,16 +15,30 @@ class PlanningSheet
     end
   end
 
+  def upload!
+    initiatives.reject do |i|
+      i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
+    end.each do |i|
+      i.push_dates_and_status_to_epic
+      puts i.epic.app_url
+      binding.pry
+    end
+  rescue => e
+    binding.pry
+  end
+
   def upload_interactive
-    initiatives.each do |i|
+    initiatives.reject do |i|
+      i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
+    end.each do |i|
       ap({
         # TODO: Should we use the epic name instead?
         epic_url: i.epic.app_url,
         name: i.row.name,
         row_status: i.row.status,
         epic_state: i.epic.workflow_state.name,
-        row_target: i.row.target_date,
-        epic_target: i.epic.planned_ends_at&.to_date
+        row_dates: [i.row.start_date, i.row.target_date],
+        epic_dates: [i.epic.planned_start_date&.to_date, i.epic.planned_ends_at&.to_date]
       })
 
       print "Which is more correct? row/epic/[skip]: "
@@ -104,6 +118,10 @@ class PlanningSheet
 
   def last_modified_at
     drive_v3.get_file(spreadsheet_id, fields: "modifiedTime").modified_time
+  end
+
+  def to_s
+    "PlanningSheet[#{spreadsheet_id}]"
   end
 
   def spreadsheet

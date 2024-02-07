@@ -84,7 +84,7 @@ class SheetRow
 
   def start_date
     @start_date ||= begin
-      Date.iso8601(fetch(:start_date).formatted_value)
+      Date.iso8601(fetch(:start_date).formatted_value).in_time_zone("America/New_York")
     rescue
       nil
     end
@@ -92,7 +92,7 @@ class SheetRow
 
   def target_date
     @target_date ||= begin
-      Date.iso8601(fetch(:target_date).formatted_value)
+      Date.iso8601(fetch(:target_date).formatted_value).in_time_zone("America/New_York")
     rescue
       nil
     end

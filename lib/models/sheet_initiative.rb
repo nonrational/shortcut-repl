@@ -56,13 +56,15 @@ class SheetInitiative
     product_group_id = Group.find_by_name("Product").id
     owner = Member.fuzzy_find_by_name(row.owner_name) unless row.owner_name == "None"
 
-    attrs = {
-      # TODO: add quarterly labels
-      planned_start_date: row.start_date&.to_date&.iso8601,
-      deadline: row.target_date&.to_date&.iso8601
-    }
+    # TODO: add quarterly labels
 
-    if owner.present?
+    attrs = {}
+
+    attrs[:planned_start_date] = row.start_date.iso8601 if row.start_date.present?
+    attrs[:deadline] = row.target_date.iso8601 if row.target_date.present?
+    attrs[:group_id] = product_group_id if product_group_id.present? && epic.group_id != product_group_id
+
+    if owner.present? && owner.id != epic.owner_ids.first
       attrs[:owner_ids] = [owner.id]
     end
 
@@ -70,14 +72,9 @@ class SheetInitiative
       attrs[:epic_state_id] = epic_workflow_state.id
     end
 
-    if epic.group_id != product_group_id
-      attrs[:group_id] = product_group_id
-    end
-
-    # ap(attrs)
-    # binding.pry
     result = epic.update(attrs)
-    # binding.pry
+
+    binding.pry unless result.success?
 
     @epic = Epic.new(result)
   end
@@ -170,7 +167,11 @@ class SheetInitiative
   end
 
   def status_match?
-    row.status.delete(" ") == epic.workflow_state.name.delete(" ")
+    row.status&.downcase&.gsub(/[^a-z]/i, "") == epic.workflow_state.name&.downcase&.gsub(/[^a-z]/i, "")
+  end
+
+  def start_date_match?
+    row.start_date == epic.planned_start_date&.to_date
   end
 
   def target_date_match?
