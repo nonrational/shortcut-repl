@@ -1,1 +1,0 @@
-String.include CoreExtensions::String
