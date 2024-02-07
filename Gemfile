@@ -13,6 +13,9 @@ gem "shortcut_ruby"
 gem "sinatra"
 gem "table_print"
 
-gem "dotenv", groups: [:development]
-gem "rerun", groups: [:development]
-gem "standard", group: [:development, :test]
+group :development do
+  gem "ruby-lsp", require: false
+  gem "dotenv"
+  gem "rerun"
+  gem "standard"
+end

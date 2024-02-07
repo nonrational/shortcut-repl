@@ -78,6 +78,7 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
+    prism (0.19.0)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -116,6 +117,10 @@ GEM
     rubocop-performance (1.19.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
+    ruby-lsp (0.13.4)
+      language_server-protocol (~> 3.17.0)
+      prism (>= 0.19.0, < 0.20)
+      sorbet-runtime (>= 0.5.10782)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     shortcut_ruby (0.11.0)
@@ -129,6 +134,7 @@ GEM
       rack (~> 2.2, >= 2.2.4)
       rack-protection (= 3.1.0)
       tilt (~> 2.0)
+    sorbet-runtime (0.5.11234)
     standard (1.32.1)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -167,6 +173,7 @@ DEPENDENCIES
   pry
   rake
   rerun
+  ruby-lsp
   shortcut_ruby
   sinatra
   standard
