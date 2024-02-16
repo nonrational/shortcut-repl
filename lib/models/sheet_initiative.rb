@@ -6,16 +6,21 @@ class SheetInitiative
   # delegate the name function to row
   delegate :epic_id, :name, to: :row
 
-  def pull
+  def epic?
+    epic.present?
+  end
+
+  def update_sheet
     row.batch_update_values({
-      hyperlinked_name: hyperlinked_name,
+      shortcut_id: shortcut_id,
+      hyperlinked_name: hyperlinked_epic_name,
       story_completion: stats_summary,
       participants: epic.participant_members.map(&:first_name).join(", "),
-      status: epic.workflow_state.name
+      status: sheet_status
     })
   end
 
-  def push
+  def update_epic
     push_dates_and_status_to_epic
   end
 
@@ -87,8 +92,18 @@ class SheetInitiative
   # | .__/\_,_|_|_| |_| |_| \___/_|_|_| \___| .__/_\__|
   # |_|                                     |_|
 
-  def hyperlinked_name
+  def sheet_status
+    return "✔️ Done" if epic.workflow_state.name == "Done"
+
+    epic.workflow_state.name
+  end
+
+  def hyperlinked_epic_name
     "=HYPERLINK(\"#{epic_uri_with_group_by}\", \"#{safe_epic_name}\")"
+  end
+
+  def shortcut_id
+    "epic-#{epic.id}" if epic.present?
   end
 
   def epic_uri_with_group_by

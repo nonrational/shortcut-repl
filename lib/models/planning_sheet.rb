@@ -2,15 +2,7 @@ require "google/apis/sheets_v4"
 
 class PlanningSheet
   def download!
-    initiatives.map do |i|
-      res_name = i.pull_name_from_epic
-      res_stats = i.pull_story_stats_from_epic
-      res_parts = i.pull_participants_from_epic
-
-      (res_name.updated_cells + res_stats.updated_cells + res_parts.updated_cells).tap do |s|
-        binding.pry unless s == 3
-      end
-    end
+    initiatives.filter(&:epic?).each(&:update_sheet)
   end
 
   def upload!
