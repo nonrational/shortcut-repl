@@ -3,8 +3,6 @@ require "google/apis/sheets_v4"
 class PlanningSheet
   def download!
     initiatives.map do |i|
-      puts i
-
       res_name = i.pull_name_from_epic
       res_stats = i.pull_story_stats_from_epic
       res_parts = i.pull_participants_from_epic
@@ -16,12 +14,14 @@ class PlanningSheet
   end
 
   def upload!
+    push_sheet_order_to_shortcut!
+
     initiatives.reject do |i|
       i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
     end.each do |i|
       i.push_dates_and_status_to_epic
       puts i.epic.app_url
-      binding.pry
+      # binding.pry
     end
   rescue => e
     binding.pry

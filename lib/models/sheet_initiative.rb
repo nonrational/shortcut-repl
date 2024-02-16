@@ -7,10 +7,12 @@ class SheetInitiative
   delegate :epic_id, :name, to: :row
 
   def pull
-    pull_name_from_epic
-    pull_target_dates_from_epic
-    pull_status_from_epic
-    pull_story_stats_from_epic
+    row.batch_update_values({
+      hyperlinked_name: hyperlinked_name,
+      story_completion: stats_summary,
+      participants: epic.participant_members.map(&:first_name).join(", "),
+      status: epic.workflow_state.name
+    })
   end
 
   def push
@@ -85,45 +87,31 @@ class SheetInitiative
   # | .__/\_,_|_|_| |_| |_| \___/_|_|_| \___| .__/_\__|
   # |_|                                     |_|
 
-  def pull_dates_and_status_from_epic
-    # TODO
+  def hyperlinked_name
+    "=HYPERLINK(\"#{epic_uri_with_group_by}\", \"#{safe_epic_name}\")"
   end
 
-  def pull_target_dates_from_epic
-    # TODO
-  end
+  def epic_uri_with_group_by
+    epic_uri = URI.parse(epic.app_url)
 
-  def pull_status_from_epic
-    # TODO: Spacing here might matter. Not sure if this is safe.
-    row.update_cell_value(:status, epic.workflow_state.name)
-  end
-
-  def pull_name_from_epic
-    raw_app_url = epic.app_url
-    # append `?group_by=workflow_state_id` to all hyperlinked epics
-    uri = URI.parse(raw_app_url)
-    query_params = URI.decode_www_form(uri.query || "")
+    query_params = URI.decode_www_form(epic_uri.query || "")
     query_params << ["group_by", "workflow_state_id"]
-    uri.query = URI.encode_www_form(query_params)
 
-    # translate double quotes to single quotes to avoid breaking the google sheet formula
-    safe_epic_name = epic.name.tr('"', "'")
-
-    row.update_cell_value(:hyperlinked_name, "=HYPERLINK(\"#{uri}\", \"#{safe_epic_name}\")")
+    epic_uri.query = URI.encode_www_form(query_params)
+    epic_uri
   end
 
-  def pull_story_stats_from_epic
+  def safe_epic_name
+    # translate double quotes to single quotes to avoid breaking the google sheet formula
+    epic.name.tr('"', "'")
+  end
+
+  def stats_summary
     total = epic.stats["num_stories_total"]
     in_progress = epic.stats["num_stories_started"]
     done = epic.stats["num_stories_done"]
 
-    stats_summary = "#{total} / #{in_progress} / #{done} (#{epic.percent_complete})"
-
-    row.update_cell_value(:story_completion, stats_summary)
-  end
-
-  def pull_participants_from_epic
-    row.update_cell_value(:participants, epic.participant_members.map(&:first_name).join(", "))
+    "#{total} / #{in_progress} / #{done} (#{epic.percent_complete})"
   end
 
   #       _ _   _   _                     _

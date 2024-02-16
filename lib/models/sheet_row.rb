@@ -6,19 +6,35 @@ class SheetRow
   # A	    B	    C	  D	        E	    F	      G       H	    I	      J	    K	  L	           M
   # index	Name	Doc	Shortcut	Owner	Urgency	Status	Begin	Target	Start	End	Last Mention Notes
 
-  def update_cell_value(name, user_entered_value)
-    value_range = Google::Apis::SheetsV4::ValueRange.new(
-      range: cell_range_by_column_name(name),
-      values: [[user_entered_value]]
+  def batch_update_values(hash)
+    value_ranges = hash.map do |k, v|
+      Google::Apis::SheetsV4::ValueRange.new(
+        range: cell_range_by_column_name(k),
+        values: [[v]]
+      )
+    end
+
+    # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/SheetsV4/BatchUpdateValuesRequest.html
+    batch_request = Google::Apis::SheetsV4::BatchUpdateValuesRequest.new(
+      data: value_ranges,
+      value_input_option: "USER_ENTERED"
     )
 
-    sheets_v4.update_spreadsheet_value(
-      spreadsheet_id,
-      cell_range_by_column_name(name),
-      value_range,
-      value_input_option: "USER_ENTERED",
-      options: {authorization: auth_client}
-    )
+    # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/SheetsV4/SheetsService.html#batch_update_values-instance_method
+    # batch_update_values(
+    #   spreadsheet_id,
+    #   batch_update_values_request_object = nil,
+    #   fields: nil,
+    #   quota_user: nil,
+    #   options: nil) {|result, err| ... } ⇒ Google::Apis::SheetsV4::BatchUpdateValuesResponse
+    sheets_v4.batch_update_values(spreadsheet_id, batch_request, options: {authorization: auth_client}) do |result, err|
+      binding.pry if err
+      result
+    end
+  end
+
+  def update_value(name, user_entered_value)
+    batch_update_values(name => user_entered_value)
   end
 
   def sheets_v4
