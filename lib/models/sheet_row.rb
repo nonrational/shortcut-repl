@@ -81,6 +81,10 @@ class SheetRow
     name_hyperlink&.match(/epic\/(\d+)/)&.captures&.first&.to_i
   end
 
+  def story_id
+    name_hyperlink&.match(/story\/(\d+)/)&.captures&.first&.to_i
+  end
+
   # this could be story-xxxx or epic-xxxx
   def shortcut_id
     fetch(:shortcut_id).formatted_value

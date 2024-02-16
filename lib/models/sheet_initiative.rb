@@ -10,14 +10,27 @@ class SheetInitiative
     epic.present?
   end
 
+  def story?
+    story.present?
+  end
+
   def update_sheet
-    row.batch_update_values({
-      shortcut_id: shortcut_id,
-      hyperlinked_name: hyperlinked_epic_name,
-      story_completion: stats_summary,
-      participants: epic.participant_members.map(&:first_name).join(", "),
-      status: sheet_status
-    })
+    if epic?
+      row.batch_update_values({
+        shortcut_id: shortcut_id,
+        hyperlinked_name: hyperlinked_epic_name,
+        story_completion: stats_summary,
+        participants: epic.participant_members.map(&:first_name).join(", "),
+        status: sheet_status
+      })
+    elsif story?
+      row.batch_update_values({
+        shortcut_id: shortcut_id,
+        hyperlinked_name: hyperlinked_story_name,
+        story_completion: "-",
+        participants: story.owner_members.map(&:first_name).join(", ")
+      })
+    end
   end
 
   def update_epic
@@ -102,8 +115,15 @@ class SheetInitiative
     "=HYPERLINK(\"#{epic_uri_with_group_by}\", \"#{safe_epic_name}\")"
   end
 
+  def hyperlinked_story_name
+    "=HYPERLINK(\"#{story.app_url}\", \"#{safe_story_name}\")"
+  end
+
   def shortcut_id
     "epic-#{epic.id}" if epic.present?
+    "story-#{story.id}" if story.present?
+
+    "N/A"
   end
 
   def epic_uri_with_group_by
@@ -119,6 +139,11 @@ class SheetInitiative
   def safe_epic_name
     # translate double quotes to single quotes to avoid breaking the google sheet formula
     epic.name.tr('"', "'")
+  end
+
+  def safe_story_name
+    # translate double quotes to single quotes to avoid breaking the google sheet formula
+    story.name.tr('"', "'")
   end
 
   def stats_summary
@@ -151,6 +176,10 @@ class SheetInitiative
   # does the sheet row list a valid shortcut epic?
   def epic
     @epic ||= Scrb.recent_epics.find { |e| e.id == epic_id } if epic_id.present?
+  end
+
+  def story
+    @story ||= Story.find_by_id(row.story_id) if row.story_id.present?
   end
 
   def drive_v3
