@@ -43,7 +43,7 @@ class Epic
   end
 
   def planned_starts_at
-    DateTime.parse(planned_start_date.to_s) unless planned_start_date.nil?
+    DateTime.parse(planned_start_date.to_s).in_time_zone("America/New_York") unless planned_start_date.nil?
   end
 
   def planned_starts_at=(at)
@@ -51,7 +51,7 @@ class Epic
   end
 
   def planned_ends_at
-    DateTime.parse(target_date.to_s) unless target_date.nil?
+    DateTime.parse(target_date.to_s).in_time_zone("America/New_York") unless target_date.nil?
   end
 
   def planned_ends_at=(at)

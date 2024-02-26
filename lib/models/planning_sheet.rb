@@ -1,26 +1,32 @@
 require "google/apis/sheets_v4"
 
 class PlanningSheet
+  def current_epic_initatives
+    initiatives.filter(&:epic?).reject do |i|
+      puts "#{i} is in-sync. Skipping..." if i.in_sync?
+      # ap(i.in_sync_details) if !i.in_sync?
+      # binding.pry if !i.in_sync?
+      i.in_sync?
+    end
+  end
+
   def download!
     puts "Fetching initiatives with epics..."
-    initiatives_with_epics = initiatives.filter(&:epic?).reject do |i|
-      i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
-    end
+    initiatives
 
-    puts "Updating sheet with #{initiatives_with_epics.count} initiatives..."
-    initiatives_with_epics.each do |i|
+    puts "Updating sheet with #{current_epic_initatives.count} initiatives..."
+    current_epic_initatives.each do |i|
       puts i
+      result = i.update_sheet
 
-      i.update_sheet
+      binding.pry
     end
   end
 
   def upload!
     push_sheet_order_to_shortcut!
 
-    initiatives.reject do |i|
-      i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
-    end.each do |i|
+    current_epic_initatives.each do |i|
       i.push_dates_and_status_to_epic
       puts i.epic.app_url
       # binding.pry
@@ -30,9 +36,7 @@ class PlanningSheet
   end
 
   def upload_interactive
-    initiatives.reject do |i|
-      i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
-    end.each do |i|
+    current_epic_initatives.each do |i|
       ap({
         # TODO: Should we use the epic name instead?
         epic_url: i.epic.app_url,
@@ -40,7 +44,7 @@ class PlanningSheet
         row_status: i.row.status,
         epic_state: i.epic.workflow_state.name,
         row_dates: [i.row.start_date, i.row.target_date],
-        epic_dates: [i.epic.planned_start_date&.to_date, i.epic.planned_ends_at&.to_date]
+        epic_dates: [i.epic.planned_starts_at, i.epic.planned_ends_at]
       })
 
       print "Which is more correct? row/epic/[skip]: "

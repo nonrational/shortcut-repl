@@ -136,7 +136,7 @@ class SheetInitiative
   #
 
   def to_s
-    puts "[#{row_index}] #{row.name}"
+    "[#{row_index}] #{row.name}"
   end
 
   def row
@@ -161,23 +161,32 @@ class SheetInitiative
     @auth_client ||= GoogleCredentials.load!
   end
 
-  def any_mismatch?
-    !name_match? or !status_match? or !target_date_match?
+  def in_sync?
+    name_match? && status_match? && start_date_match? && target_date_match?
+  end
+
+  def in_sync_details
+    {
+      name: name_match?,
+      status: status_match?,
+      start_date: start_date_match?,
+      target_date: target_date_match?
+    }
   end
 
   def name_match?
-    row.name.downcase == epic.name.downcase
+    row.name == safe_epic_name
   end
 
   def status_match?
-    row.status&.downcase&.gsub(/[^a-z]/i, "") == epic.workflow_state.name&.downcase&.gsub(/[^a-z]/i, "")
+    row.status == sheet_status
   end
 
   def start_date_match?
-    row.start_date == epic.planned_start_date&.to_date
+    row.start_date == epic.planned_starts_at
   end
 
   def target_date_match?
-    row.target_date == epic.target_date&.to_date
+    row.target_date == epic.planned_ends_at
   end
 end
