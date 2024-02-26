@@ -37,7 +37,7 @@ class Epic
     return "Group already assigned" if self.group_id == group_id
 
     result = update(group_id: group_id)
-    binding.pry
+    # binding.pry
 
     :ok
   end

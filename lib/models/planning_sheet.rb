@@ -17,9 +17,7 @@ class PlanningSheet
     puts "Updating sheet with #{current_epic_initatives.count} initiatives..."
     current_epic_initatives.each do |i|
       puts i
-      result = i.update_sheet
-
-      binding.pry
+      i.update_sheet
     end
   end
 
