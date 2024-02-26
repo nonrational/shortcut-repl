@@ -27,7 +27,7 @@ class PlanningSheet
     push_sheet_order_to_shortcut!
 
     current_epic_initatives.each do |i|
-      i.push_dates_and_status_to_epic
+      i.update_epic
       puts i.epic.app_url
       # binding.pry
     end
@@ -51,11 +51,11 @@ class PlanningSheet
       winner = $stdin.gets
 
       if /ro?w?/i.match?(winner)
-        # push row to epic
-        i.push_dates_and_status_to_epic
+        # write row details to epic
+        i.update_epic
       elsif /ep?i?c?/i.match?(winner)
-        # pull epic to row
-        puts "not implemented yet"
+        # write epic details to sheet
+        i.update_sheet
       end
     end
   rescue => e
