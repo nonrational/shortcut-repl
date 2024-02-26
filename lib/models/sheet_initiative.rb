@@ -63,7 +63,7 @@ class SheetInitiative
     product_group_id = Group.find_by_name("Product").id
     owner = Member.fuzzy_find_by_name(row.owner_name) unless row.owner_name == "None"
 
-    # TODO: add quarterly labels
+    # TODO: add quarterly labels?
 
     attrs = {}
 

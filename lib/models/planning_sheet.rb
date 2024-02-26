@@ -2,7 +2,17 @@ require "google/apis/sheets_v4"
 
 class PlanningSheet
   def download!
-    initiatives.filter(&:epic?).each(&:update_sheet)
+    puts "Fetching initiatives with epics..."
+    initiatives_with_epics = initiatives.filter(&:epic?).reject do |i|
+      i.epic.completed? && i.status_match? && i.target_date_match? && i.start_date_match?
+    end
+
+    puts "Updating sheet with #{initiatives_with_epics.count} initiatives..."
+    initiatives_with_epics.each do |i|
+      puts i
+
+      i.update_sheet
+    end
   end
 
   def upload!

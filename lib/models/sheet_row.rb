@@ -7,26 +7,26 @@ class SheetRow
   # index	Name	Doc	Shortcut	Owner	Urgency	Status	Begin	Target	Start	End	Last Mention Notes
 
   def batch_update_values(hash)
-    value_ranges = hash.map do |k, v|
+    list_of_data_ranges = hash.map do |k, v|
       Google::Apis::SheetsV4::ValueRange.new(
         range: cell_range_by_column_name(k),
         values: [[v]]
       )
     end
 
+    ap list_of_data_ranges
+
     # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/SheetsV4/BatchUpdateValuesRequest.html
     batch_request = Google::Apis::SheetsV4::BatchUpdateValuesRequest.new(
-      data: value_ranges,
+      data: list_of_data_ranges,
+      # The values will be parsed as if the user typed them into the UI.
+      # Numbers will stay as numbers, but strings may be converted to numbers, dates, etc.
+      # following the same rules that are applied when entering text into a cell
+      # via the Google Sheets UI.
       value_input_option: "USER_ENTERED"
     )
 
     # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/SheetsV4/SheetsService.html#batch_update_values-instance_method
-    # batch_update_values(
-    #   spreadsheet_id,
-    #   batch_update_values_request_object = nil,
-    #   fields: nil,
-    #   quota_user: nil,
-    #   options: nil) {|result, err| ... } ⇒ Google::Apis::SheetsV4::BatchUpdateValuesResponse
     sheets_v4.batch_update_values(spreadsheet_id, batch_request, options: {authorization: auth_client}) do |result, err|
       binding.pry if err
       result
