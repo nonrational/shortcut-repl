@@ -2,10 +2,9 @@ require "google/apis/sheets_v4"
 
 class PlanningSheet
   def current_epic_initatives
+    # TODO: Update `story?` rows as well.
     initiatives.filter(&:epic?).reject do |i|
-      puts "#{i} is in-sync. Skipping..." if i.in_sync?
-      # ap(i.in_sync_details) if !i.in_sync?
-      # binding.pry if !i.in_sync?
+      # puts "#{i} is in-sync. Skipping..." if i.in_sync?
       i.in_sync?
     end
   end
@@ -16,7 +15,6 @@ class PlanningSheet
 
     puts "Updating sheet with #{current_epic_initatives.count} initiatives..."
     current_epic_initatives.each do |i|
-      puts i
       i.update_sheet
     end
   end
@@ -35,15 +33,21 @@ class PlanningSheet
 
   def upload_interactive
     current_epic_initatives.each do |i|
-      ap({
-        # TODO: Should we use the epic name instead?
-        epic_url: i.epic.app_url,
-        name: i.row.name,
-        row_status: i.row.status,
-        epic_state: i.epic.workflow_state.name,
-        row_dates: [i.row.start_date, i.row.target_date],
-        epic_dates: [i.epic.planned_starts_at, i.epic.planned_ends_at]
-      })
+      # calculate the width from the widest value in the table
+      width = i.to_table_data.reduce(0) do |acc, row|
+        row.reduce(acc) { |acc, v| [acc, v.to_s.size].max }
+      end
+
+      # TODO: figure out how to display tablular data in the console.
+      header = i.column_headers.map { |v| v.to_s.ljust(width) }.join(" | ")
+
+      table_data = i.to_table_data.map do |row|
+        row.map do |v|
+          v.to_s.ljust(width + (/\p{Emoji}/.match?(v) ? 1 : 0))
+        end.join(" | ")
+      end.join("\n")
+
+      puts header, table_data
 
       print "Which is more correct? row/epic/[skip]: "
       winner = $stdin.gets

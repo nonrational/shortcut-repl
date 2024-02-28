@@ -73,6 +73,10 @@ class SheetRow
     fetch(:hyperlinked_doctype).hyperlink
   end
 
+  def story_completion
+    fetch(:story_completion).formatted_value
+  end
+
   def document_id
     doctype_hyperlink.reverse.split("/")[1].reverse
   end

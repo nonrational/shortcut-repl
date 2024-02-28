@@ -6,31 +6,30 @@ class SheetInitiative
   # delegate the name function to row
   delegate :epic_id, :name, to: :row
 
+  # Is this initiative represented by a shortcut epic?
   def epic?
     epic.present?
   end
 
+  # Is this initiative represented by a shortcut story?
   def story?
     story.present?
   end
 
   def update_sheet
-    if epic?
-      row.batch_update_values({
-        shortcut_id: shortcut_id,
-        hyperlinked_name: hyperlinked_epic_name,
-        story_completion: stats_summary,
-        participants: epic.participant_members.map(&:first_name).join(", "),
-        status: sheet_status
-      })
-    elsif story?
-      row.batch_update_values({
-        shortcut_id: shortcut_id,
-        hyperlinked_name: hyperlinked_story_name,
-        story_completion: "-",
-        participants: story.owner_members.map(&:first_name).join(", ")
-      })
-    end
+    attrs = {
+      shortcut_id: shortcut_id,
+      hyperlinked_name: hyperlinked_name,
+      story_completion: stats_summary,
+      participants: participants
+    }
+
+    # TODO: Figure out how to translate status for stories?
+    attrs[:status] = sheet_status if epic?
+
+    ap(attrs)
+
+    row.batch_update_values(attrs)
   end
 
   def update_epic
@@ -66,11 +65,6 @@ class SheetInitiative
     )
   end
 
-  #               _      _                  _
-  #  _ __ _  _ __| |_   | |_ ___   ___ _ __(_)__
-  # | '_ \ || (_-< ' \  |  _/ _ \ / -_) '_ \ / _|
-  # | .__/\_,_/__/_||_|  \__\___/ \___| .__/_\__|
-  # |_|                               |_|
   def push_dates_and_status_to_epic
     epic_workflow_state = EpicWorkflow.fetch.find_state_by_name(row.status)
     product_group_id = Group.find_by_name("Product").id
@@ -99,29 +93,22 @@ class SheetInitiative
     @epic = Epic.new(result)
   end
 
-  #            _ _    __                          _
-  #  _ __ _  _| | |  / _|_ _ ___ _ __    ___ _ __(_)__
-  # | '_ \ || | | | |  _| '_/ _ \ '  \  / -_) '_ \ / _|
-  # | .__/\_,_|_|_| |_| |_| \___/_|_|_| \___| .__/_\__|
-  # |_|                                     |_|
-
   def sheet_status
     return "✔️ Done" if epic.workflow_state.name == "Done"
 
     epic.workflow_state.name
   end
 
-  def hyperlinked_epic_name
-    "=HYPERLINK(\"#{epic_uri_with_group_by}\", \"#{safe_epic_name}\")"
-  end
+  def hyperlinked_name
+    return "=HYPERLINK(\"#{epic_uri_with_group_by}\", \"#{safe_name}\")" if epic?
+    return "=HYPERLINK(\"#{story.app_url}\", \"#{safe_name}\")" if story?
 
-  def hyperlinked_story_name
-    "=HYPERLINK(\"#{story.app_url}\", \"#{safe_story_name}\")"
+    row.name
   end
 
   def shortcut_id
-    "epic-#{epic.id}" if epic.present?
-    "story-#{story.id}" if story.present?
+    "epic-#{epic.id}" if epic?
+    "story-#{story.id}" if story?
 
     "N/A"
   end
@@ -136,22 +123,25 @@ class SheetInitiative
     epic_uri
   end
 
-  def safe_epic_name
+  def safe_name
     # translate double quotes to single quotes to avoid breaking the google sheet formula
-    epic.name.tr('"', "'")
-  end
-
-  def safe_story_name
-    # translate double quotes to single quotes to avoid breaking the google sheet formula
-    story.name.tr('"', "'")
+    (epic || story || row).name.tr('"', "'")
   end
 
   def stats_summary
+    return "-" if story?
+
     total = epic.stats["num_stories_total"]
     in_progress = epic.stats["num_stories_started"]
     done = epic.stats["num_stories_done"]
 
     "#{total} / #{in_progress} / #{done} (#{epic.percent_complete})"
+  end
+
+  def participants
+    return epic.participant_members.map(&:first_name).join(", ") if epic?
+    return story.owner_members.map(&:first_name).join(", ") if story?
+    "-"
   end
 
   #       _ _   _   _                     _
@@ -191,7 +181,7 @@ class SheetInitiative
   end
 
   def in_sync?
-    name_match? && status_match? && start_date_match? && target_date_match?
+    in_sync_details.values.all?
   end
 
   def in_sync_details
@@ -199,12 +189,32 @@ class SheetInitiative
       name: name_match?,
       status: status_match?,
       start_date: start_date_match?,
-      target_date: target_date_match?
+      target_date: target_date_match?,
+      story_stats: story_stats_match?
     }
   end
 
+  def column_headers(width = 30)
+    [" ", "Row", "Epic"]
+  end
+
+  def to_table_data(width = 30)
+    [
+      ["URL", "", epic.app_url],
+      ["Name", row.name, epic.name],
+      ["Status", row.status, epic.workflow_state.name],
+      ["Start", row.start_date&.to_date&.iso8601, epic.planned_starts_at&.to_date&.iso8601],
+      ["Target", row.target_date&.to_date&.iso8601, epic.planned_ends_at&.to_date&.iso8601]
+    ]
+  end
+
+  def story_stats_match?
+    return true if story?
+    row.story_completion == stats_summary
+  end
+
   def name_match?
-    row.name == safe_epic_name
+    row.name == safe_name
   end
 
   def status_match?

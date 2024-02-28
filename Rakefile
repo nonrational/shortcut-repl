@@ -18,36 +18,18 @@ end
 
 load_paths!
 
-namespace :sheet do
+namespace :planning do
   desc "Fetch information from shortcut and update the sheet with it"
-  task :pull do
+  task :update_sheet do
     PlanningSheet.new.download!
   end
 
-  task :"push-interactive" do
+  task :review_interactive do
     PlanningSheet.new.upload_interactive
   end
 end
 
 namespace :iteration do
-  desc "Preview the next handful iteration start/end dates"
-  task :preview do
-    curr = Iteration.find_futuremost
-    3.times { puts curr = curr.build_next }
-  end
-
-  desc "Move all unfinished stories from the previous iteration to the current iteration"
-  task :cutover do
-    cutover = BulkUnfinishedStoryMigration.new
-    puts "Moving #{cutover.incomplete_stories.count} unfinished stories from #{cutover.previous_iteration.name} to #{cutover.current_iteration.name}"
-    cutover.run
-  end
-
-  desc "Print a pipe delimited list of all epics that have work scheduled in the current iteration"
-  task :kickoff do
-    IterationKickoffReport.new.print(:csv)
-  end
-
   desc "Create the next iteration"
   task :create_next do
     curr = Iteration.find_futuremost || Iteration.find_current
@@ -66,26 +48,15 @@ namespace :iteration do
       puts "Sorting ready stories by priority..."
       IterationReadySort.new.run
     end
-
-    task :check do
-      Iteration.next(3).each do |iteration|
-        sort = IterationReadySort.new(iteration: iteration)
-        result_char = sort.sorted? ? "✅" : "❌"
-        puts "#{result_char} – #{sort.iteration.name}"
-      end
-    end
-
-    desc "Preview the stories that would be sorted in the ready column in the current iteration by epic and priority"
-    task :preview do
-      puts IterationReadySort.new.preview
-    end
   end
 end
 
-namespace :project_sync do
-  desc "Ensure that all stories with a project have the correct product area set"
-  task :run do
-    BulkProjectSync.new.run
+namespace :shortcut do
+  namespace :project_sync do
+    desc "Ensure that all stories with a project have the correct product area set"
+    task :run do
+      BulkProjectSync.new.run
+    end
   end
 end
 

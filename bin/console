@@ -30,6 +30,7 @@ def lib_files
 
   [
     'lib/behaviors',
+    'lib/support',
     'lib/models',
     'lib/models/custom_fields',
     'lib/tasks',
