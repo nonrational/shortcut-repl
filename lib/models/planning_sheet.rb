@@ -1,5 +1,8 @@
 require "google/apis/sheets_v4"
 
+# This represents the entire planning sheet, and is comprised of many
+# intiatives, which represent the rows in the sheet. Each initative
+# may have a corresponding epic or story in Shortcut.
 class PlanningSheet
   def current_epic_initatives
     # TODO: Update `story?` rows as well.

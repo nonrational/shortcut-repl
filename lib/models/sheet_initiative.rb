@@ -1,4 +1,5 @@
-# An initiative represents a line-item in a planning spreadsheet and a corresponding shortcut epic.
+# An initiative represents a line-item in a planning
+# sheet and a corresponding shortcut epic (or story).
 class SheetInitiative
   include ActiveModel::Model
   attr_accessor :row_data, :row_index, :spreadsheet_id, :spreadsheet_range, :sheet_name
@@ -107,8 +108,8 @@ class SheetInitiative
   end
 
   def shortcut_id
-    "epic-#{epic.id}" if epic?
-    "story-#{story.id}" if story?
+    return "epic-#{epic.id}" if epic?
+    return "story-#{story.id}" if story?
 
     "N/A"
   end
