@@ -6,16 +6,22 @@ A REPL wrapper for [Shortcut](https://www.shortcut.com/) and [Google Workspace](
 
 ```
 $ rake -T
-rake config:check                       # Check config is valid
-rake config:export                      # Export the config.yml file as a base64 encoded string
-rake iteration:create_next              # Create the next iteration
-rake iteration:cutover                  # Move all unfinished stories from the previous iteration to the current iteration
-rake iteration:kickoff                  # Print a pipe delimited list of all epics that have work scheduled in the current iteration
-rake iteration:preview                  # Preview the next handful iteration start/end dates
-rake iteration:ready_sort:preview       # Preview the stories that would be sorted in the ready column in the current iteration by epic and priority
-rake iteration:ready_sort:run           # Sort all the stories in the ready column in the current iteration by epic and priority
-rake planning:sync_names_from_shortcut  # Fix any names in the planning sheet that don't match their epic's name
-rake project_sync:run                   # Ensure that all stories with a project have the correct product area set
+rake config:check               # Check config is valid
+rake config:export              # Export the config.yml file as a base64 encoded string
+rake iteration:create_next      # Create the next iteration
+rake iteration:ready_sort:run   # Sort all the stories in the ready column in the current iteration by epic and priority
+rake planning:review            # Interactively review any out-of-sync initiatives and choose whether to update shortcut or the sheet
+rake planning:update_sheet      # Fetch information from shortcut and update the sheet with it
+rake shortcut:project_sync:run  # Ensure that all stories with a project have the correct product area set
+```
+
+## Development
+
+```shell
+asdf plugin-add ruby
+asdf install
+gem install bundler
+bundle
 ```
 
 ## Configuration

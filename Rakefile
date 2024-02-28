@@ -24,7 +24,8 @@ namespace :planning do
     PlanningSheet.new.download!
   end
 
-  task :review_interactive do
+  desc "Interactively review any out-of-sync initiatives and choose whether to update shortcut or the sheet"
+  task :review do
     PlanningSheet.new.upload_interactive
   end
 end
