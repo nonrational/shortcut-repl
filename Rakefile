@@ -28,6 +28,18 @@ namespace :planning do
   task :review do
     PlanningSheet.new.upload_interactive
   end
+
+  desc "Sort epics by sheet order and ready stories by priority"
+  task :prioritize_shortcut do
+    task :run do
+      puts "Sorting epics by planning sheet order..."
+      # ensure that the priority order reflected in the planning sheet is respected
+      PlanningSheet.new.push_sheet_order_to_shortcut!
+      # then sort all the "ready" cards in the current iteration
+      puts "Sorting ready stories by priority..."
+      IterationReadySort.new.run
+    end
+  end
 end
 
 namespace :iteration do
@@ -37,18 +49,6 @@ namespace :iteration do
     next_iteration = curr.build_next
     puts "Creating #{next_iteration.name} from #{next_iteration.start_date} to #{next_iteration.end_date}"
     curr.build_next.save
-  end
-
-  namespace :ready_sort do
-    desc "Sort all the stories in the ready column in the current iteration by epic and priority"
-    task :run do
-      puts "Sorting epics by planning sheet order..."
-      # ensure that the priority order reflected in the planning sheet is respected
-      PlanningSheet.new.push_sheet_order_to_shortcut!
-      # then sort all the "ready" cards in the current iteration
-      puts "Sorting ready stories by priority..."
-      IterationReadySort.new.run
-    end
   end
 end
 

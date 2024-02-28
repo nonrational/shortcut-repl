@@ -8,7 +8,8 @@ class PlanningSheet
     # TODO: Update `story?` rows as well.
     initiatives.filter(&:epic?).reject do |i|
       # puts "#{i} is in-sync. Skipping..." if i.in_sync?
-      i.in_sync?
+      # i.in_sync? || true
+      false
     end
   end
 
