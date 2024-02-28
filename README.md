@@ -6,13 +6,13 @@ A REPL wrapper for [Shortcut](https://www.shortcut.com/) and [Google Workspace](
 
 ```
 $ rake -T
-rake config:check               # Check config is valid
-rake config:export              # Export the config.yml file as a base64 encoded string
-rake iteration:create_next      # Create the next iteration
-rake iteration:ready_sort:run   # Sort all the stories in the ready column in the current iteration by epic and priority
-rake planning:review            # Interactively review any out-of-sync initiatives and choose whether to update shortcut or the sheet
-rake planning:update_sheet      # Fetch information from shortcut and update the sheet with it
-rake shortcut:project_sync:run  # Ensure that all stories with a project have the correct product area set
+rake config:check                  # Check config is valid
+rake config:export                 # Export the config.yml file as a base64 encoded string
+rake iteration:create_next         # Create the next iteration
+rake planning:prioritize_shortcut  # Sort epics by sheet order and ready stories by priority
+rake planning:review               # Interactively review any out-of-sync initiatives and choose whether to update shortcut or the sheet
+rake planning:update_sheet         # Fetch information from shortcut and update the sheet with it
+rake shortcut:project_sync:run     # Ensure that all stories with a project have the correct product area set
 ```
 
 ## Development
