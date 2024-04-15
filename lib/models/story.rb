@@ -27,6 +27,12 @@ class Story
     def search(query)
       StorySearch.new(query: query).tap(&:fetch_all).stories
     end
+
+    def create(attrs)
+      result = ScrbClient.post("/stories", body: attrs.to_json)
+      binding.pry unless result.created?
+      Story.new(result)
+    end
   end
 
   def ready?

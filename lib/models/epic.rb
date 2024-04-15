@@ -11,11 +11,21 @@ class Epic
     end
 
     def find(id)
-      all.find { |e| e.id == id }
+      result = ScrbClient.get("/epics/#{id}")
+      return nil unless result.ok?
+      Epic.new(result)
     end
 
     def search(query)
       EpicSearch.new(query: query).tap(&:fetch_all).epics
+    end
+
+    # https://developer.shortcut.com/api/rest/v3#Create-Epic
+
+    def create(attrs)
+      result = ScrbClient.post("/epics", body: attrs.to_json)
+      binding.pry unless result.created?
+      Epic.new(result)
     end
   end
 
@@ -36,8 +46,9 @@ class Epic
     return "Group not found" if group_id.nil?
     return "Group already assigned" if self.group_id == group_id
 
-    result = update(group_id: group_id)
-    # binding.pry
+    result = update(group_ids: [group_id])
+
+    binding.pry unless result.ok?
 
     :ok
   end
