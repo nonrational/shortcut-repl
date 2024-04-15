@@ -1,9 +1,23 @@
+shortcut-team-id: eeeeeeee-aaaa-4bbb-3ccc-dddddddddddd
+planning-sheet-id: xxxxxxxxxxxxxx
+planning-sheet-range: "Sheet 1!A1:S100"
+chores-epic-sheet-id: xxxxxxxxxxxxxxxx
+chores-epic-sheet-range: "Sheet 1!A1:J20"
+# TODO: Fetch this from Objectives properly
+technical-objective-id: 14005
+planning-document-folders-by-doctype:
+  prd: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  rfc: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 project-product-areas:
-  project-name: product-area-name
-workflow-name: Default
+  backend: backend
+  design: design
+  frontend: frontend
+workflow-name: Engineering
 ready-state-name: "Ready for Work"
-stale-state-name: "Deploying"
+stale-state-name: "Ready for Deploy"
 default-priority-value: Normal
 product-area-priorities:
-  high-product-area-name: 0
-  low-product-area-name: 3
+  scoping: 0
+  design: 1
+  frontend: 2
+  backend: 2
