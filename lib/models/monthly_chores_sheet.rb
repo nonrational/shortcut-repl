@@ -1,11 +1,11 @@
 require "google/apis/sheets_v4"
 
-class EpicSheetImport
+class MonthlyChoresSheet
   include ActiveModel::Model
 
   attr_accessor :epic_name
 
-  def load
+  def create_epic_and_stories
     raise "epic_name is required" unless epic_name.present?
 
     if epic.nil?
@@ -14,8 +14,6 @@ class EpicSheetImport
     else
       puts "Found Epic: #{epic.name}"
     end
-
-    binding.pry
 
     story_row_data.filter { |s| s[:name].present? }.each do |story_attrs|
       puts "Creating Story: #{story_attrs[:name]}"
