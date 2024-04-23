@@ -31,14 +31,12 @@ namespace :planning do
 
   desc "Sort epics by sheet order and ready stories by priority"
   task :prioritize_shortcut do
-    task :run do
-      puts "Sorting epics by planning sheet order..."
-      # ensure that the priority order reflected in the planning sheet is respected
-      PlanningSheet.new.push_sheet_order_to_shortcut!
-      # then sort all the "ready" cards in the current iteration
-      puts "Sorting ready stories by priority..."
-      IterationReadySort.new.run
-    end
+    puts "Sorting epics by planning sheet order..."
+    # ensure that the priority order reflected in the planning sheet is respected
+    PlanningSheet.new.push_sheet_order_to_shortcut!
+    # then sort all the "ready" cards in the current iteration
+    puts "Sorting ready stories by priority..."
+    IterationReadySort.new.run
   end
 end
 

@@ -7,9 +7,11 @@ class PlanningSheet
   def current_epic_initatives
     # TODO: Update `story?` rows as well.
     initiatives.filter(&:epic?).reject do |i|
-      # puts "#{i} is in-sync. Skipping..." if i.in_sync?
-      # i.in_sync? || true
-      false
+      if i.in_sync?
+        puts "#{i} is in-sync. Skipping..."
+      end
+
+      i.in_sync?
     end
   end
 
@@ -37,6 +39,8 @@ class PlanningSheet
 
   def upload_interactive
     current_epic_initatives.each do |i|
+      puts "#{i} is out-of-sync by #{i.out_of_sync_details}"
+
       # calculate the width from the widest value in the table
       width = i.to_table_data.reduce(0) do |acc, row|
         row.reduce(acc) { |acc, v| [acc, v.to_s.size].max }

@@ -185,6 +185,12 @@ class SheetInitiative
     in_sync_details.values.all?
   end
 
+  def out_of_sync_details
+    out_of_sync = []
+    in_sync_details.each { |k, v| out_of_sync << k unless v }
+    out_of_sync
+  end
+
   def in_sync_details
     {
       name: name_match?,
