@@ -132,11 +132,7 @@ class SheetInitiative
   def stats_summary
     return "-" if story?
 
-    total = epic.stats["num_stories_total"]
-    in_progress = epic.stats["num_stories_started"]
-    done = epic.stats["num_stories_done"]
-
-    "#{total} / #{in_progress} / #{done} (#{epic.percent_complete})"
+    "#{epic.percent_complete} – #{epic.stats["num_stories_started"]} in-flight, #{epic.stats["num_stories_unstarted"]} remaining"
   end
 
   def participants
