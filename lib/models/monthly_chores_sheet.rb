@@ -3,17 +3,19 @@ require "google/apis/sheets_v4"
 class MonthlyChoresSheet
   include ActiveModel::Model
 
-  attr_accessor :epic_name
+  attr_writer :as_of
+  attr_reader :starts_at
 
-  def create_epic_and_stories
-    raise "epic_name is required" unless epic_name.present?
+  def create_next_epic
+    @starts_at = as_of.at_beginning_of_month.next_month.to_datetime.utc
 
-    if epic.nil?
-      puts "Creating Epic: #{epic_attrs[:name]}"
-      @epic = Epic.create(epic_attrs)
-    else
-      puts "Found Epic: #{epic.name}"
+    if epic.present?
+      puts "#{epic.name} exists. Bailing out..."
+      return
     end
+
+    puts "Creating Epic: #{epic_attrs[:name]}"
+    @epic = Epic.create(epic_attrs)
 
     story_row_data.filter { |s| s[:name].present? }.each do |story_attrs|
       puts "Creating Story: #{story_attrs[:name]}"
@@ -24,17 +26,23 @@ class MonthlyChoresSheet
     end
   end
 
+  def as_of
+    @as_of ||= Date.today
+  end
+
   def epic
     @epic ||= Epic.search(epic_attrs[:name]).find { |e| e.name == epic_attrs[:name] }
   end
 
   def epic_attrs
     {
-      name: epic_name,
+      name: "#{starts_at.strftime("%B %Y")} Tech Chores",
       description: "Monthly Tech Chores :tada:",
+      group_ids: [product_group_id],
+      # TODO: Generalize this objective ID
       objective_ids: [14005], # this is the tech debt / misc objective,
-      planned_start_date: DateTime.now.beginning_of_month.iso8601,
-      deadline: DateTime.now.end_of_month.iso8601
+      planned_start_date: starts_at.beginning_of_month.iso8601,
+      deadline: starts_at.end_of_month.iso8601
     }
   end
 
@@ -42,6 +50,8 @@ class MonthlyChoresSheet
   def story_row_data
     sheet.data[0].row_data.drop(1).map do |row|
       {
+        # TODO: Set correct iteration
+        # TODO: Set correct Product Area. ProjectSync already has similar logic.
         name: row.values[0].formatted_value,
         story_type: row.values[1].formatted_value,
         description: description_with_attribution(row.values[2].formatted_value),

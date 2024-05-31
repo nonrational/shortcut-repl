@@ -50,6 +50,13 @@ namespace :iteration do
   end
 end
 
+namespace :monthly_chores do
+  desc "Create the next monthly chores epic"
+  task :create_next do
+    MonthlyChoresSheet.new.create_next_epic
+  end
+end
+
 namespace :shortcut do
   namespace :project_sync do
     desc "Ensure that all stories with a project have the correct product area set"
