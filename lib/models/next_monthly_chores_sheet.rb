@@ -1,14 +1,17 @@
 require "google/apis/sheets_v4"
 
-class MonthlyChoresSheet
+class NextMonthlyChoresSheet
   include ActiveModel::Model
 
+  # By default, this will create chores for the _next_ month,
+  # so be sure to backdate this if you're running this on the first of the month.
   attr_writer :as_of
-  attr_reader :starts_at
+
+  def next_epic_name
+    epic_attrs[:name]
+  end
 
   def create_next_epic
-    @starts_at = as_of.at_beginning_of_month.next_month.to_datetime.utc
-
     if epic.present?
       puts "#{epic.name} exists. Bailing out..."
       return
@@ -32,6 +35,10 @@ class MonthlyChoresSheet
 
   def epic
     @epic ||= Epic.search(epic_attrs[:name]).find { |e| e.name == epic_attrs[:name] }
+  end
+
+  def starts_at
+    @starts_at ||= as_of.at_beginning_of_month.next_month.to_datetime.utc
   end
 
   def epic_attrs

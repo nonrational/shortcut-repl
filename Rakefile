@@ -53,7 +53,11 @@ end
 namespace :monthly_chores do
   desc "Create the next monthly chores epic"
   task :create_next do
-    MonthlyChoresSheet.new.create_next_epic
+    NextMonthlyChoresSheet.new.tap do |sheet|
+      print "Creating #{sheet.next_epic_name}. Proceed? yes/[no]: "
+      result = $stdin.gets
+      sheet.create_next_epic if /ye?s?/i.match?(result)
+    end
   end
 end
 
