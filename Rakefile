@@ -40,16 +40,6 @@ namespace :planning do
   end
 end
 
-namespace :iteration do
-  desc "Create the next iteration"
-  task :create_next do
-    curr = Iteration.find_futuremost || Iteration.find_current
-    next_iteration = curr.build_next
-    puts "Creating #{next_iteration.name} from #{next_iteration.start_date} to #{next_iteration.end_date}"
-    curr.build_next.save
-  end
-end
-
 namespace :monthly_chores do
   desc "Create the next monthly chores epic"
   task :create_next do
@@ -66,6 +56,16 @@ namespace :shortcut do
     desc "Ensure that all stories with a project have the correct product area set"
     task :run do
       BulkProjectSync.new.run
+    end
+  end
+
+  namespace :iteration do
+    desc "Create the next iteration"
+    task :create_next do
+      curr = Iteration.find_futuremost || Iteration.find_current
+      next_iteration = curr.build_next
+      puts "Creating #{next_iteration.name} from #{next_iteration.start_date} to #{next_iteration.end_date}"
+      curr.build_next.save
     end
   end
 end
