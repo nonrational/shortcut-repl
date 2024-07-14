@@ -8,7 +8,7 @@ technical-objective-id: 14005
 planning-document-folders-by-doctype:
   prd: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   rfc: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-project-product-areas:
+project-technical-areas:
   backend: backend
   design: design
   frontend: frontend
@@ -16,7 +16,7 @@ workflow-name: Engineering
 ready-state-name: "Ready for Work"
 stale-state-name: "Ready for Deploy"
 default-priority-value: Normal
-product-area-priorities:
+technical-area-priorities:
   scoping: 0
   design: 1
   frontend: 2

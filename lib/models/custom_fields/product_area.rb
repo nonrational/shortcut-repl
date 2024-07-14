@@ -2,7 +2,7 @@ class ProductArea < CustomField::Value
   include ActiveModel::Model
 
   def self.all
-    @all ||= CustomField.find_field("Product Area").values.map { |v| new(v) }.filter(&:enabled)
+    @all ||= CustomField.find_field("Technical Area").values.map { |v| new(v) }.filter(&:enabled)
   end
 
   def self.find_by_id(value_id)
@@ -14,7 +14,7 @@ class ProductArea < CustomField::Value
   end
 
   def config_priorities
-    Scrb.fetch_config!("product-area-priorities")
+    Scrb.fetch_config!("technical-area-priorities")
   end
 
   def default_priority

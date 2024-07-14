@@ -64,7 +64,7 @@ class IterationReadySort
 
   def epic_product_area_position(story)
     # TODO: consider a story's position within its epic
-    in_progress_epics.find_index { |e| e.id == story.epic_id } || story.product_area_priority
+    in_progress_epics.find_index { |e| e.id == story.epic_id } || story.technical_area_priority
   end
 
   def priority_values_by_id

@@ -59,16 +59,16 @@ class Story
     @owner_members ||= owner_ids.map { |uuid| Member.find(uuid) }
   end
 
-  def product_area
-    @product_area ||= ProductArea.find_by_id(product_area_value_id)
+  def technical_area
+    @technical_area ||= TechnicalArea.find_by_id(technical_area_value_id)
   end
 
   def priority
     @priority ||= Scrb.priority_custom_field.find_value_by_id(priority_value_id) || Scrb.default_priority_custom_field
   end
 
-  def product_area_priority
-    @product_area_priority ||= product_area&.priority || ProductArea.all.count + 1
+  def technical_area_priority
+    @technical_area_priority ||= technical_area&.priority || TechnicalArea.all.count + 1
   end
 
   def priority_position
@@ -77,8 +77,8 @@ class Story
 
   private
 
-  def product_area_value_id
-    @product_area_value_id ||= custom_fields.find { |cf| cf["field_id"] == Scrb.product_area_custom_field.id }.try(:[], "value_id")
+  def technical_area_value_id
+    @technical_area_value_id ||= custom_fields.find { |cf| cf["field_id"] == Scrb.product_area_custom_field.id }.try(:[], "value_id")
   end
 
   def priority_value_id
