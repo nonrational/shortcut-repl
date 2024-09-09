@@ -62,10 +62,23 @@ class NextMonthlyChoresSheet
         name: row.values[0].formatted_value,
         story_type: row.values[1].formatted_value,
         description: description_with_attribution(row.values[2].formatted_value),
-        project_id: row.values[3].formatted_value,
         group_id: product_group_id,
         epic_id: epic&.id,
-        workflow_state_id: ready_workflow_state_id
+        workflow_state_id: ready_workflow_state_id,
+        custom_fields: [
+          {
+            field_id: TechnicalArea.field.id,
+            value_id: TechnicalArea.all.find { |ta| ta.name == row.values[9].formatted_value }&.id
+          },
+          {
+            field_id: Priority.field.id,
+            value_id: Priority.default.id
+          },
+          {
+            field_id: PartnerImpact.field.id,
+            value_id: PartnerImpact.find_by_value("Low").id
+          }
+        ]
       }
     end
   end

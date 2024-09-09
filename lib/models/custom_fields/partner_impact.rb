@@ -1,8 +1,8 @@
-class Priority < CustomField::Value
+class PartnerImpact < CustomField::Value
   include ActiveModel::Model
 
   def self.field
-    @field ||= CustomField.find_field("Priority")
+    @field ||= CustomField.find_field("Partner Impact")
   end
 
   def self.all
@@ -15,9 +15,5 @@ class Priority < CustomField::Value
 
   def self.find_by_value(value_pattern)
     all.find { |v| v.value.match(/#{value_pattern}/i) }
-  end
-
-  def self.default
-    @default ||= find_by_value(::Scrb.fetch_config!("default-priority-value"))
   end
 end
