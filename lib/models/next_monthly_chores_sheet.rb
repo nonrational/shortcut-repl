@@ -76,7 +76,7 @@ class NextMonthlyChoresSheet
           },
           {
             field_id: PartnerImpact.field.id,
-            value_id: PartnerImpact.find_by_value("Low").id
+            value_id: PartnerImpact.find_by_value("Indirect").id
           }
         ]
       }
