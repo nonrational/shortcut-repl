@@ -38,7 +38,7 @@ class NextMonthlyChoresSheet
   end
 
   def starts_at
-    @starts_at ||= as_of.at_beginning_of_month.next_month.to_datetime.utc
+    @starts_at ||= as_of.at_beginning_of_month.next_month.to_datetime.at_noon
   end
 
   def epic_attrs
@@ -81,6 +81,10 @@ class NextMonthlyChoresSheet
         ]
       }
     end
+  end
+
+  def appropriate_iteration
+    [starts_at.strftime("%B"), "H2", starts_at.strftime("%Y")].join(" ")
   end
 
   def description_with_attribution(desc)
