@@ -16,6 +16,10 @@ class Epic
       Epic.new(result)
     end
 
+    def find_or_create_by(attrs)
+      search(attrs[:name]).find { |e| e.name == attrs[:name] } || create(attrs)
+    end
+
     def search(query)
       EpicSearch.new(query: query).tap(&:fetch_all).epics
     end

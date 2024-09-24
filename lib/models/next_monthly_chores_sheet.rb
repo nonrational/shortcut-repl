@@ -12,13 +12,13 @@ class NextMonthlyChoresSheet
   end
 
   def create_next_epic
-    if epic.present?
-      puts "#{epic.name} exists. Bailing out..."
-      return
-    end
+    @epic = Epic.find_or_create_by(epic_attrs)
+    puts "#{@epic.name} - #{@epic.app_url}"
+    puts "#{first_half_iteration.name} - #{first_half_iteration.app_url}"
+    print "Create stories? yes/[no]: "
 
-    puts "Creating Epic: #{epic_attrs[:name]}"
-    @epic = Epic.create(epic_attrs)
+    result = $stdin.gets
+    return unless /ye?s?/i.match?(result)
 
     story_row_data.filter { |s| s[:name].present? }.each do |story_attrs|
       puts "Creating Story: #{story_attrs[:name]}"
@@ -65,6 +65,7 @@ class NextMonthlyChoresSheet
         group_id: product_group_id,
         epic_id: epic&.id,
         workflow_state_id: ready_workflow_state_id,
+        iteration_id: first_half_iteration&.id,
         custom_fields: [
           {
             field_id: TechnicalArea.field.id,
@@ -83,8 +84,8 @@ class NextMonthlyChoresSheet
     end
   end
 
-  def appropriate_iteration
-    [starts_at.strftime("%B"), "H2", starts_at.strftime("%Y")].join(" ")
+  def first_half_iteration
+    @first_half_iteration ||= Iteration.find_by_name([starts_at.strftime("%B"), "H1", starts_at.strftime("%Y")].join(" "))
   end
 
   def description_with_attribution(desc)
