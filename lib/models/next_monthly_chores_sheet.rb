@@ -15,12 +15,13 @@ class NextMonthlyChoresSheet
     @epic = Epic.find_or_create_by(epic_attrs)
     puts "#{@epic.name} - #{@epic.app_url}"
     puts "#{first_half_iteration.name} - #{first_half_iteration.app_url}"
+
     print "Create stories? yes/[no]: "
 
     result = $stdin.gets
     return unless /ye?s?/i.match?(result)
 
-    story_row_data.filter { |s| s[:name].present? }.each do |story_attrs|
+    story_row_data.each do |story_attrs|
       puts "Creating Story: #{story_attrs[:name]}"
       Story.create(story_attrs)
       # ap story_attrs
@@ -55,13 +56,12 @@ class NextMonthlyChoresSheet
 
   # https://developer.shortcut.com/api/rest/v3#Create-Story
   def story_row_data
-    sheet.data[0].row_data.drop(1).map do |row|
+    # Ignore rows that are "off-cycle" for this month's epic.
+    sheet.data[0].row_data.drop(1).filter { |r| include_row_this_month?(r) }.map do |row|
       {
-        # TODO: Set correct iteration
-        # TODO: Set correct Product Area. ProjectSync already has similar logic.
-        name: row.values[0].formatted_value,
-        story_type: row.values[1].formatted_value,
-        description: description_with_attribution(row.values[2].formatted_value),
+        name: value_at_col(row, :A).formatted_value,
+        story_type: value_at_col(row, :B).formatted_value,
+        description: description_with_attribution(value_at_col(row, :C).formatted_value),
         group_id: product_group_id,
         epic_id: epic&.id,
         workflow_state_id: ready_workflow_state_id,
@@ -69,7 +69,7 @@ class NextMonthlyChoresSheet
         custom_fields: [
           {
             field_id: TechnicalArea.field.id,
-            value_id: TechnicalArea.all.find { |ta| ta.name == row.values[9].formatted_value }&.id
+            value_id: TechnicalArea.all.find { |ta| ta.name == value_at_col(row, :J).formatted_value }&.id
           },
           {
             field_id: Priority.field.id,
@@ -82,6 +82,29 @@ class NextMonthlyChoresSheet
         ]
       }
     end
+  end
+
+  # For example, A chore scheduled for every 3 months will be added in Jan, Apr, Jul, and Oct.
+  def include_row_this_month?(row)
+    return false if value_at_col(row, :A).formatted_value.blank?
+
+    each_month = value_at_col(row, :K).formatted_value&.to_i
+
+    (each_month.nil? || each_month == 1 || (starts_at.month - 1) % each_month == 0).tap do |result|
+      puts "Excluding '#{value_at_col(row, :A).formatted_value}' this month" unless result
+    end
+  end
+
+  def value_at_col(row, col)
+    index = col.to_s.chars.reverse.each_with_index.reduce(0) do |sum, (char, index)|
+      sum + (char.ord - 64) * (26**index)
+    end - 1
+
+    row.values[index]
+  end
+
+  def epic_description
+    File.read(File.expand_path("../../../templates/monthly-tech-chores.md", __FILE__)) || "Monthly Tech Chores :tada:"
   end
 
   def first_half_iteration
