@@ -3,3 +3,4 @@
 .rake_tasks~
 config.yml
 *.json
+/templates/*.md
