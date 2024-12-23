@@ -46,7 +46,7 @@ class Iteration
     :group_ids, :group_mention_ids, :id, :label_ids, :labels, :member_mention_ids, :mention_ids,
     :name, :stats, :status, :updated_at
 
-  [:started, :done, :unstarted].each { |status| define_method("#{status}?") { self.status.to_sym == status } }
+  [:started, :done, :unstarted].each { |status| define_method(:"#{status}?") { self.status.to_sym == status } }
   alias_method :current?, :started?
   alias_method :finished?, :done?
 
@@ -92,16 +92,17 @@ class Iteration
     end
   end
 
-  # instance methods #########################################
-
-  def self.print_all_for_year(year)
+  def self.print_sheet_iterations
     curr = Iteration.find_current
+    future_year = curr.year + 1
 
-    while curr.year == year
-      puts curr
+    while curr.start_date.year <= future_year
+      puts "#{curr.short_name},#{curr.start_date},#{curr.end_date}"
       curr = curr.build_next
     end
   end
+
+  # instance methods #########################################
 
   def exists?
     self.class.where(name: name).any?
@@ -112,6 +113,11 @@ class Iteration
   end
 
   delegate :year, to: :end_date
+
+  def short_name
+    month_str, half_str, year_str = name.split(" ")
+    "#{month_str[0, 3]} #{half_str} '#{year_str[-2, 2]}"
+  end
 
   def to_s
     # handy for csv rows
