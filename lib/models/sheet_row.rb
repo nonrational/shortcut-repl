@@ -122,6 +122,10 @@ class SheetRow
     end
   end
 
+  def to_s
+    "#{sheet_name}:#{row_index}"
+  end
+
   private
 
   def fetch(col_name)
@@ -131,6 +135,11 @@ class SheetRow
   end
 
   def value_at(col_sym)
+    if row_data.values.nil?
+      # puts "#{col_sym} of #{self} is nil"
+      return EmptyValue.new
+    end
+
     column = col_sym.to_s.upcase
     cell_value = row_data.values[column.chars.reduce(0) { |acc, char| acc * 26 + (char.ord - "A".ord) }]
 

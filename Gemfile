@@ -13,6 +13,10 @@ gem "shortcut_ruby"
 gem "sinatra"
 gem "table_print"
 
+# required to serve the oauth endpoints
+gem "rackup", "~> 2.2"
+gem "puma", "~> 6.5"
+
 group :development do
   gem "ruby-lsp", require: false
   gem "dotenv"

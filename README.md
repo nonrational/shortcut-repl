@@ -54,5 +54,3 @@ curl -o "$(brew --prefix)/etc/bash_completion.d/rake" \
 ## Automation via GitHub Actions
 
 Once you've got everything configured in `config.yml`, run `rake config:export` to produce a base64'd version suitable to drop into your ENV.
-
-
