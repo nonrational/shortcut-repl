@@ -1,10 +1,10 @@
 require "google/apis/sheets_v4"
 
 # This represents the entire planning sheet, and is comprised of many
-# intiatives, which represent the rows in the sheet. Each initative
+# initiatives, which represent the rows in the sheet. Each initiative
 # may have a corresponding epic or story in Shortcut.
 class PlanningSheet
-  def current_epic_initatives
+  def current_epic_initiatives
     # TODO: Update `story?` rows as well.
     initiatives.filter(&:epic?).reject do |i|
       if i.in_sync?
@@ -19,8 +19,8 @@ class PlanningSheet
     puts "Fetching initiatives with epics..."
     initiatives
 
-    puts "Updating sheet with #{current_epic_initatives.count} initiatives..."
-    current_epic_initatives.each do |i|
+    puts "Updating sheet with #{current_epic_initiatives.count} initiatives..."
+    current_epic_initiatives.each do |i|
       i.update_sheet
     end
   end
@@ -28,7 +28,7 @@ class PlanningSheet
   def upload!
     push_sheet_order_to_shortcut!
 
-    current_epic_initatives.each do |i|
+    current_epic_initiatives.each do |i|
       i.update_epic
       puts i.epic.app_url
       # binding.pry
@@ -38,7 +38,7 @@ class PlanningSheet
   end
 
   def upload_interactive
-    current_epic_initatives.each do |i|
+    current_epic_initiatives.each do |i|
       puts "#{i} is out-of-sync by #{i.out_of_sync_details}"
 
       # calculate the width from the widest value in the table

@@ -6,7 +6,7 @@ require "dotenv/load"
 require "google/api_client/client_secrets"
 require "json"
 require "sinatra"
-require_relative "./lib/models/google_credentials"
+require_relative "lib/models/google_credentials"
 
 get "/" do
   redirect to("/oauth2callback") unless GoogleCredentials.exist?
@@ -42,11 +42,11 @@ get "/oauth2callback" do
     redirect_uri: url("/oauth2callback")
   )
 
-  if request["code"].nil?
+  if request.params["code"].nil?
     auth_uri = auth_client.authorization_uri.to_s
     redirect to(auth_uri)
   else
-    auth_client.code = request["code"]
+    auth_client.code = request.params["code"]
     auth_client.fetch_access_token!
     creds_json = auth_client.to_json
 
