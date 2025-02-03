@@ -1,4 +1,6 @@
 require "google/apis/sheets_v4"
+require "google/apis/drive_v3"
+require "tempfile"
 
 # This represents the entire planning sheet, and is comprised of many
 # initiatives, which represent the rows in the sheet. Each initiative
@@ -35,6 +37,12 @@ class PlanningSheet
     end
   rescue => e
     binding.pry
+  end
+
+  def download_as_xlsx
+    file_id = spreadsheet_id
+    file = drive_v3.export_file(file_id, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", download_dest: "#{file_id}.xlsx")
+    puts "Spreadsheet downloaded as #{file.name}"
   end
 
   def upload_interactive
