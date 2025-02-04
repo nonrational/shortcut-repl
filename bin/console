@@ -32,6 +32,8 @@ def lib_files
     'lib/behaviors',
     'lib/support',
     'lib/models',
+    'lib/models/google_workspace',
+    'lib/models/ms_excel',
     'lib/models/custom_fields',
     'lib/tasks',
     'lib',

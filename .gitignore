@@ -1,6 +1,8 @@
 .env
 *.csv
+*.xlsx
+*.json
+~$*
 .rake_tasks~
 config.yml
-*.json
 /templates/*.md
