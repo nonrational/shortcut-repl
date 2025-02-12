@@ -7,14 +7,15 @@ class Story
     :group_id, :group_mention_ids, :id, :iteration_id, :label_ids, :labels, :lead_time, :linked_file_ids, :linked_files,
     :member_mention_ids, :mention_ids, :moved_at, :name, :num_tasks_completed, :owner_ids, :position, :previous_iteration_ids,
     :project_id, :pull_requests, :requested_by_id, :started, :started_at, :started_at_override, :stats, :story_links,
-    :story_template_id, :story_type, :task_ids, :tasks, :updated_at, :workflow_id, :workflow_state_id
+    :story_template_id, :story_type, :task_ids, :tasks, :updated_at, :workflow_id, :workflow_state_id, :sub_task_story_ids,
+    :parent_story_id
 
   alias_method :blocked?, :blocked
   alias_method :blocker?, :blocker
   alias_method :archived?, :archived
   alias_method :started?, :started
   alias_method :completed?, :completed
-  [:feature, :bug, :chore].each { |type| define_method("#{type}?") { story_type.to_sym == type } }
+  [:feature, :bug, :chore].each { |type| define_method(:"#{type}?") { story_type.to_sym == type } }
 
   alias_method :target_date, :deadline
   alias_method :target_date=, :deadline=
